@@ -1,0 +1,85 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    {% if user.profile.verified %}
+        {% if entries.count == 0 %}
+            <article class="media content-section">
+                <h4 class="article-title">Δεν υπάρχουν καταχωρίσεις.</h4>
+            </article>
+        {% else %}
+            <h3>Καταχωρίσεις</h3>
+
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <td>Ειδικότητα</td>
+                    <td>Ώρες</td>
+                    <td>Είδος</td>
+                    <td>Προτεραιότητα</td>
+                    <td>Παρατηρήσεις</td>
+                    <td>Χρονική σήμανση</td>
+                    <td>Επεξεργασία</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for entry in entries %}
+                    <tr>
+                        <td> {{ entry.specialty }} </td>
+                        <td> {{ entry.hours }} </td>
+                        <td> {{ entry.type }} </td>
+                        <td>
+                            {% if entry.priority %}
+                                Ναι
+                            {% else %}
+                                Όχι
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if entry.description != None %}
+                                {{ entry.description }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td> {{ entry.date_time|date:'Y-m-d@H:m' }} </td>
+                        <td>
+                            <a class="btn btn-secondary btn-sm mt-1 mb-1"
+                               href="{% url 'main_app:entry_update' entry.id %}">Τροποποίηση</a>
+                            <a class="btn btn-danger btn-sm mt-1 mb-1"
+                               href="{% url 'main_app:entry_delete' entry.id %}">Διαγραφή</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        {% if is_paginated %}
+
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-info mb-4" href="?page=1">Αρχή</a>
+                <a class="btn btn-outline-info mb-4"
+                   href="?page={{ page_obj.previous_page_number }}">Προηγούμενη</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Επόμενη</a>
+                <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Τέλος</a>
+            {% endif %}
+
+        {% endif %}
+    {% else %}
+        <article class="media content-section">
+            <div class="media-body">
+                <h4 class="article-title">Δεν έχει γίνει η επαλήθευση του χρήστη.</h4>
+            </div>
+        </article>
+    {% endif %}
+{% endblock content %}

@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'main_app/main.css' %}">
+
+    {% if title %}
+        <title>ΔΔΕ Ηρακλείου - {{ title }}</title>
+    {% else %}
+        <title>ΔΔΕ Ηρακλείου</title>
+    {% endif %}
+</head>
+<body>
+<header class="site-header">
+    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+            <a class="navbar-brand mr-4" href="{% url 'main_app:home' %}">ΔΔΕ Ηρακλείου / Εφαρμογή καταχώρισης κενών</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
+                    aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                    <!--
+                    <a class="nav-item nav-link" href="{% url 'main_app:home' %}">Αρχική</a>
+                    -->
+                </div>
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <a class="nav-item nav-link" href="{% url 'users:info' %}">{{ user.username }}</a>
+                        <a class="nav-item nav-link" href="{% url 'users:logout' %}">Αποσύνδεση</a>
+                    {% else %}
+                        <a class="nav-item nav-link" href="{% url 'users:login' %}">Σύνδεση</a>
+                        <a class="nav-item nav-link" href="{% url 'users:register' %}">Εγγραφή</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-8">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags != 'error' %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+        {% if user.is_authenticated %}
+            {% if user.is_superuser %}
+                <div class="col-md-4">
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="/admin/">Διαχείριση Βάσης</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'schools:clear_status' %}">Διαγραφή Επικαιροποιήσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'main_app:clear_entries' %}">Διαγραφή Καταχωρίσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'history:clear_history' %}">Διαγραφή Ιστορικού Καταχωρίσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                             <span class="sidebar-item">Σχολικές μονάδες [ <a class="sidebar-item"
+                                                                              href="{% url 'excels:upload_schools' %}">Εισαγωγή</a> |
+                                 <a class="sidebar-item"
+                                    href="{% url 'excels:add_schools' %}">Προσθήκη</a> ] </span>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                             <span class="sidebar-item">Ειδικοτήτες [ <a class="sidebar-item"
+                                                                         href="{% url 'excels:upload_specialties' %}">Εισαγωγή</a> |
+                                 <a class="sidebar-item"
+                                    href="{% url 'excels:add_specialties' %}">Προσθήκη</a> ] </span>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'schools:schools' %}">Προβολή Σχολικών μονάδων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'main_app:specialties' %}">Προβολή Ειδικοτήτων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'main_app:entries' %}">Προβολή Καταχωρίσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'main_app:entries_vacancies' %}">Προβολή Κενών</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'main_app:entries_surplus' %}">Προβολή Πλεονασμάτων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <span class="sidebar-item">Εξαγωγή καταχωρίσεων σε
+                                [ <a class="sidebar-item" href="{% url 'excels:excel_entries' %}">xlsx</a> |
+                                <a class="sidebar-item" href="{% url 'pdfs:pdf_entries' %}">pdf</a> ]
+                            </span>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'schools:check_schools' %}">Έλεγχος Χρηστών-Σχολικών
+                                μονάδων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'schools:check_status' %}">Έλεγχος Επικαιροποιήσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'history:history' %}">Ιστορικό Καταχωρίσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <span class="sidebar-item">Εξαγωγή ιστορικού σε
+                                [ <a class="sidebar-item" href="{% url 'excels:excel_history' %}">xlsx</a> |
+                                <a class="sidebar-item" href="{% url 'pdfs:pdf_history' %}">pdf</a> ]
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="col-md-4">
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'users:info' %}">Πληροφορίες για το Σχολείο</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'main_app:entry_create' %}">Προσθήκη καταχώρισης</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'main_app:user_entries' %}">Προβολή καταχωρίσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'pdfs:pdf_user_entries' %}">Εκτύπωση καταχωρίσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'schools:status_update' %}">Επικαιροποίηση</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'history:user_history' %}">Ιστορικό καταχωρίσεων</a>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <span class="sidebar-item">Εξαγωγή ιστορικού σε
+                                [ <a class="sidebar-item" href="{% url 'excels:excel_user_history' %}">xlsx</a> |
+                                <a class="sidebar-item" href="{% url 'pdfs:pdf_user_history' %}">pdf</a> ]
+                            </span>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'main_app:about' %}">Σχετικά με την εφαρμογή</a>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+        {% endif %}
+        {% block content-section %}{% endblock %}
+    </div>
+</main>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+</html>

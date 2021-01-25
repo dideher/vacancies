@@ -1,0 +1,9 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <h2>Έχεις αποσυνδεθεί.</h2>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            <a href="{% url 'users:login' %}">Επανασύνδεση</a>
+        </small>
+    </div>
+{% endblock content %}

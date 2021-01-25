@@ -1,0 +1,65 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <h3>Κενά</h3>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <td>Ειδικότητα</td>
+            <td>Ώρες</td>
+            <td>Είδος</td>
+            <td>Προτεραιότητα</td>
+            <td>Παρατηρήσεις</td>
+            <td>Χρονική σήμανση</td>
+            <td>Σχολείο</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in entries %}
+            <tr>
+                <td> {{ entry.specialty.code }} </td>
+                <td> {{ entry.hours }} </td>
+                <td> {{ entry.type }} </td>
+                <td>
+                    {% if entry.priority %}
+                        Ναι
+                    {% else %}
+                        Όχι
+                    {% endif %}
+                </td>
+                <td>
+                    {% if entry.description != None %}
+                        {{ entry.description }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td> {{ entry.date_time|date:'Y-m-d@H:m' }} </td>
+                <td> {{ entry.owner.last_name }} </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_paginated %}
+
+        {% if page_obj.has_previous %}
+            <a class="btn btn-outline-info mb-4" href="?page=1">Αρχή</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Προηγούμενη</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Επόμενη</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Τέλος</a>
+        {% endif %}
+
+    {% endif %}
+{% endblock content %}

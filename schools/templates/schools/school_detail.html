@@ -1,0 +1,41 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <div class="content-section">
+        <h3>Πληροφορίες για το Σχολείο</h3>
+
+        <table class="table">
+            <tbody>
+            <tr>
+                <td style="width: 40%">Ονομασία</td>
+                <td>{{ school.name }}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{ school.email }}</td>
+            </tr>
+            <tr>
+                <td>Διευθυντής</td>
+                <td>{{ school.principal }}</td>
+            </tr>
+            <tr>
+                <td>Τηλέφωνο</td>
+                <td>{{ school.phone }}</td>
+            </tr>
+            <tr>
+                <td>Διεύθυνση</td>
+                <td>{{ school.address }}</td>
+            </tr>
+            <tr>
+                <td>Έχει συνδεθεί με χρήστη</td>
+                <td>
+                    {% if school.connected_to_user %}
+                        Ναι
+                    {% else %}
+                        Όχι
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

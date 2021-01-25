@@ -1,0 +1,55 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <div class="content-section">
+        <div class="media">
+            <div class="media-body">
+                <h2 class="account-heading">{{ user.username }}</h2>
+                <p class="text-secondary">{{ user.email }}</p>
+            </div>
+        </div>
+        <h3>Πληροφορίες για το Σχολείο</h3>
+
+        <table class="table">
+            <tbody>
+            <tr>
+                <td style="width: 40%">Σχολείο</td>
+                {% if user.profile.verified %}
+                    <td>{{ user.last_name }}</td>
+                {% else %}
+                    <td>Δεν έχει γίνει η επαλήθευση του χρήστη.</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td>Επαληθεύτηκε από τη ΔΔΕ</td>
+                <td>
+                    {% if user.profile.verified %}
+                        Ναι
+                    {% else %}
+                        Όχι
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Έγινε επικαιροποίηση</td>
+                <td>
+                    {% if user.profile.status %}
+                        Ναι
+                    {% else %}
+                        Όχι
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Τελευταία επικαιροποίηση</td>
+                <td>
+                    {% if user.profile.status %}
+                        {{ user.profile.status_time|date:'Y-m-d@H:m' }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
