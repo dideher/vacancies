@@ -1,0 +1,18 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Διαγραφή Καταχωρίσεων</legend>
+                Η διαγραφή των καταχωρίσεων των σχολείων πραγματοποιείται πριν το ξεκίνημα του νέου σχολικού έτους.
+                Θέλετε να συνεχίσετε ;
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-danger" type="submit">Ναι, διαγραφή</button>
+                <a class="btn btn-outline-secondary"
+                   href="{% url 'main_app:entries' %}">Επιστροφή</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

@@ -1,0 +1,104 @@
+{% load static %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style type='text/css'>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+
+        @font-face {
+            font-family: FreeSans;
+            src: url({% static 'pdfs/fonts/FreeSans.ttf' %})
+        }
+
+        *, html {
+            font-family: "FreeSans";
+        }
+
+        body {
+            padding: 10pt;
+        }
+
+        th, td {
+            padding: 2px;
+        }
+
+        th {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        td {
+            font-size: 12px;
+        }
+    </style>
+    <title>Καταχωρίσεις</title>
+</head>
+<body>
+<table>
+    <tbody>
+    <tr>
+        <td style="text-align: center; width: 30%"><img src="{% static 'pdfs/images/crest.jpg' %}" width="50"></td>
+        <td> &nbsp;</td>
+    </tr>
+    <tr>
+        <td style="text-align: center; width: 30%">Ελληνική Δημοκρατία</td>
+        <td> &nbsp;</td>
+    </tr>
+    </tbody>
+</table>
+
+<h3 style="text-align: center;font-size: 18px;font-weight: bold">Καταχωρίσεις</h3>
+
+<hr>
+
+{% for p, ue in entries %}
+    <table>
+        <tr>
+            <td style="width: 14%">Σχολείο:</td>
+            <td>{{ p.user.last_name }}</td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+        <tr>
+            <td style="text-align: center; width: 5%">Α/Α</td>
+            <td style="width: 10%">Ειδικότητα</td>
+            <td style="text-align: center; width: 5%">Ώρες</td>
+            <td style="width: 10%">Είδος</td>
+            <td style="text-align: center; width: 15%">Προτεραιότητα</td>
+            <td style="width: 30%">Παρατηρήσεις</td>
+            <td style="width: 25%">Χρονική σήμανση</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in ue %}
+            <tr>
+                <td style="text-align: center">{{ forloop.counter }}</td>
+                <td>{{ entry.specialty }}</td>
+                <td style="text-align: center">{{ entry.hours }}</td>
+                <td>{{ entry.type }}</td>
+                <td style="text-align: center">
+                    {% if entry.priority %}
+                        Ναι
+                    {% else %}
+                        Όχι
+                    {% endif %}
+                </td>
+                <td>
+                    {% if entry.description != None %}
+                        {{ entry.description }}
+                    {% endif %}
+                </td>
+                <td>{{ entry.date_time|date:'Y-m-d@H:m' }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+{% endfor %}
+</body>
+</html>

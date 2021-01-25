@@ -1,0 +1,23 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Επικαιροποίηση</legend>
+                Μπορείτε να κάνετε επικαιροποίηση, όταν σας ζητηθεί από τη ΔΔΕ, εφόσον:
+                <ul>
+                    <li>Δεν έχετε να δηλώσετε κανένα κενό/πλεόνασμα.</li>
+                    <li>Έχετε κάνει έλεγχο των καταχωρίσεων σας και ανταποκρίνονται στην εικόνα του σχολείου
+                        σας.
+                    </li>
+                </ul>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-danger" type="submit">Ναι, κάνε επικαιροποίηση</button>
+                <a class="btn btn-outline-secondary"
+                   href="{% url 'main_app:user_entries' %}">Επιστροφή</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

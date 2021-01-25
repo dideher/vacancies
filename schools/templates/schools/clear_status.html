@@ -1,0 +1,18 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Διαγραφή Επικαιροποιήσεων</legend>
+                Μπορείτε να διαγράψετε την επικαιροποίηση των σχολείων εφόσον θα ζητήσετε νέα. Θέλετε να
+                συνεχίσετε ;
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-danger" type="submit">Ναι, διαγραφή</button>
+                <a class="btn btn-outline-secondary"
+                   href="{% url 'schools:check_status' %}">Επιστροφή</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

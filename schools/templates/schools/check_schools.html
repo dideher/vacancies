@@ -1,0 +1,92 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <article class="media content-section">
+        <div class="media-body">
+            <h3 class="article-title">Έλεγχος Χρηστών-Σχολικών μονάδων</h3>
+        </div>
+    </article>
+
+    {% if p_verified_users|length != 0 %}
+        <article class="media content-section">
+            <div class="media-body">
+                <h4 class="article-title">Χρήστες-Σχολικές μονάδες που έχουν επαληθευτεί</h4>
+                <div>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <td>
+                                <nobr>Α/Α</nobr>
+                            </td>
+                            <td>Σχολείο</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for p in p_verified_users %}
+                            <tr>
+                                <td> {{ forloop.counter }} </td>
+                                <td> {{ p.user.last_name }} </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </article>
+    {% endif %}
+
+    {% if not_connected_schools|length != 0 %}
+        <article class="media content-section">
+            <div class="media-body">
+                <h4 class="article-title">Σχολικές μονάδες που δεν έχουν συνδεθεί με χρήστη</h4>
+                <div>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <td>
+                                <nobr>Α/Α</nobr>
+                            </td>
+                            <td>Σχολείο</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for s in not_connected_schools %}
+                            <tr>
+                                <td> {{ forloop.counter }} </td>
+                                <td> {{ s.name }} </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </article>
+    {% endif %}
+
+    {% if p_not_verified_users|length != 0 %}
+        <article class="media content-section">
+            <div class="media-body">
+                <h4 class="article-title">Χρήστες που έχουν καταχωρίσει τον κωδικό τους αλλά δεν έχουν επαληθευτεί</h4>
+                <div>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <td>
+                                <nobr>Α/Α</nobr>
+                            </td>
+                            <td>Χρήστης</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for p in p_not_verified_users %}
+                            <tr>
+                                <td> {{ forloop.counter }} </td>
+                                <td> {{ p.user }} </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </article>
+    {% endif %}
+{% endblock content %}
