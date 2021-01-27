@@ -6,6 +6,19 @@
         </div>
     </article>
 
+    <article class="media content-section">
+        <div class="media-body">
+            <ul style="list-style-type:none; padding: 0;">
+                <li class="alert alert-success" style="margin: 1px;">
+                    Χρήστες-Σχολικές μονάδες που έχουν επαληθευτεί: {{ p_verified_users|length }}
+                </li>
+                <li class="alert alert-danger" style="margin: 1px;">
+                    Σχολικές μονάδες που δεν έχουν συνδεθεί με χρήστη: {{ not_connected_schools|length }}
+                </li>
+            </ul>
+        </div>
+    </article>
+
     {% if p_verified_users|length != 0 %}
         <article class="media content-section">
             <div class="media-body">
