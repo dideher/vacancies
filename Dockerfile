@@ -5,14 +5,15 @@ ENV SU_EXEC_VERSION 0.2
 ## update alpine and install build deps
 RUN set -x \
     apk update \
-    && apk add --no-cache --virtual \
-        .build-deps \
+    && apk add --no-cache \
         gcc \
         libc-dev \
         linux-headers \
         jpeg-dev \ 
         zlib-dev \
-        libjpeg
+        libjpeg  \
+        mariadb-dev
+        #mariadb-client
         #postgresql-dev
 
 ## virtualenv
@@ -29,6 +30,7 @@ COPY requirements.txt ./requirements.in
 ## update requirements file with deployment requirement deps
 RUN echo "gunicorn" >> /requirements.in
 RUN echo "meinheld" >> /requirements.in
+RUN echo "mysqlclient" >> /requirements.in
 
 RUN set -x \
     && pip-compile ./requirements.in > ./requirements.txt \
@@ -45,10 +47,12 @@ ARG ENVIRONMENT=development
 RUN set -x \
     apk update \
     && apk add --virtual \
-        jpeg-dev \ 
-        zlib-dev \
-        libjpeg
-        #postgresql-dev
+        libjpeg-turbo \ 
+        zlib \
+        libjpeg \
+        openssl \
+        ca-certificates \
+        mariadb-connector-c
 
 ## copy Python dependencies from build image
 COPY --from=compile-image /opt/venv /opt/venv
