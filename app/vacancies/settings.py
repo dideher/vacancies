@@ -143,5 +143,9 @@ EMAIL_HOST_PASSWORD = '***REMOVED***'
 
 
 # Configure Django App for Heroku.
-import django_heroku
-django_heroku.settings(locals())
+try:
+    import django_heroku
+    django_heroku.settings(locals())
+except ImportError:
+    # probably not running on Heroku
+    pass
