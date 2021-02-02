@@ -20,7 +20,7 @@ services:
     networks:
       - backend
     environment:
-      MYSQL_DATABASE: 'vacancies-db'
+      MYSQL_DATABASE: 'vacancies_db'
       MYSQL_USER: 'user'
       MYSQL_PASSWORD: 'password'
       MYSQL_ROOT_PASSWORD: 'admin'

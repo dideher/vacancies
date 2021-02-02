@@ -87,7 +87,7 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vacancies-db',
+        'NAME': 'vacancies_db',
         'USER': 'user',
         'PASSWORD': 'password',
         'HOST': 'db',
