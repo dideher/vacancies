@@ -34,7 +34,7 @@
                         -
                     {% endif %}
                 </td>
-                <td> {{ entry.date_time|date:'Y-m-d@H:m' }} </td>
+                <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td>
                 <td> {{ entry.owner.last_name }} </td>
             </tr>
         {% endfor %}

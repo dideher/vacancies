@@ -43,7 +43,7 @@
                 <td>Τελευταία επικαιροποίηση</td>
                 <td>
                     {% if user.profile.status %}
-                        {{ user.profile.status_time|date:'Y-m-d@H:m' }}
+                        {{ user.profile.status_time|date:'Y-m-d@H:i' }}
                     {% else %}
                         -
                     {% endif %}
