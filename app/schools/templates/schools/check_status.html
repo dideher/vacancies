@@ -26,7 +26,7 @@
                             <tr>
                                 <td> {{ forloop.counter }} </td>
                                 <td> {{ p.user.last_name }} </td>
-                                <td> {{ p.status_time|date:'Y-m-d@H:m' }} </td>
+                                <td> {{ p.status_time|date:'Y-m-d@H:i' }} </td>
                             </tr>
                         {% endfor %}
                         </tbody>
