@@ -40,7 +40,7 @@
                                 -
                             {% endif %}
                         </td>
-                        <td> {{ entry.date_time|date:'Y-m-d@H:m' }} </td>
+                        <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td>
                         <td>
                             <a class="btn btn-secondary btn-sm mt-1 mb-1"
                                href="{% url 'main_app:entry_update' entry.id %}">Τροποποίηση</a>
