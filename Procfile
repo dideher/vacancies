@@ -1,2 +1,2 @@
 release: python manage.py migrate --noinput
-web: gunicorn vacancies.wsgi --log-file -
+web: gunicorn --pythonpath app vacancies.wsgi --log-file -
