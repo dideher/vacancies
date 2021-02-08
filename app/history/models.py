@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from main_app.models import Specialty
 from django.utils.timezone import now
-
+from django.utils.translation import gettext_lazy as _
+from main_app.models import EntryVariantType
 
 class HistoryEntry(models.Model):
     ENTRY_CHOICES = (
@@ -17,6 +18,14 @@ class HistoryEntry(models.Model):
     type = models.CharField(default='Κενό', choices=ENTRY_CHOICES, max_length=9, verbose_name='Κενό / Πλεόνασμα')
     priority = models.BooleanField(default=False, verbose_name='Προτεραιότητα')
     description = models.CharField(max_length=128, verbose_name='Παρατηρήσεις', null=True, blank=True)
+    variant = models.CharField(
+        max_length=64, 
+        verbose_name=_('Τύπος Κενού / Πλεονάσματος'), 
+        help_text=_('Επιλέξετε το είδος του κενού'), 
+        choices=EntryVariantType.choices,
+        default=EntryVariantType.GENERAL_EDUCATION,
+        null=False
+    )
 
     def __str__(self):
         return f'{self.specialty} | {self.owner} | {self.hours} | {self.type} | {self.priority} | {self.description}'

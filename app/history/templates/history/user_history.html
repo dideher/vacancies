@@ -14,6 +14,7 @@
                     <td>Ειδικότητα</td>
                     <td>Ώρες</td>
                     <td>Είδος</td>
+                    <td>Τύπος</td>
                     <td>Προτεραιότητα</td>
                     <td>Παρατηρήσεις</td>
                     <td>Χρονική σήμανση</td>
@@ -25,6 +26,7 @@
                         <td> {{ entry.specialty }} </td>
                         <td> {{ entry.hours }} </td>
                         <td> {{ entry.type }} </td>
+                        <td> {{ entry.get_variant_display }} </td>
                         <td>
                             {% if entry.priority %}
                                 Ναι

@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.validators import MinValueValidator
-
+from django.utils.translation import gettext_lazy as _
 
 class Specialty(models.Model):
     code = models.CharField(unique=True, max_length=10, verbose_name='Ειδικότητα')
@@ -10,6 +10,20 @@ class Specialty(models.Model):
 
     def __str__(self):
         return self.code
+
+class EntryVariantType(models.TextChoices):
+    
+    GENERAL_EDUCATION = 'GENERAL_EDUCATION', _('Γενικής Παιδείας για μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+    GENERAL_EDUCATION_WITH_EXAMS = 'GENERAL_EDUCATION_WITH_EXAMS', _('Γενικής Παιδείας για Πανελλαδικώς Εξεταζόμενο Μάθημα')
+    SPECIFIC_NEEDS_SMEAE = 'SPECIFIC_NEEDS_SMEAE', _('Ειδικής Αγωγής - ΣΜΕΑΕ')
+    SPECIFIC_NEEDS_INTEGRATION_CLASS = 'SPECIFIC_NEEDS_INTEGRATION_CLASS', _('Ειδικής Αγωγής - Τμήμα Ένταξης')
+    SPECIFIC_NEEDS_INTEGRATION_CLASS_DEAF = 'SPECIFIC_NEEDS_INTEGRATION_CLASS_DEAF', _('Ειδικής Αγωγής - Τμήμα Ένταξης Κωφών')
+    SPECIFIC_NEEDS_INTEGRATION_CLASS_BLIND = 'SPECIFIC_NEEDS_INTEGRATION_CLASS_BLIND', _('Ειδικής Αγωγής - Τμήμα Ένταξης Τυφλών')
+    SPECIFIC_NEEDS_PARALLEL_SUPPORT = 'SPECIFIC_NEEDS_PARALLEL_SUPPORT', _('Ειδικής Αγωγής - Παράλληλης Στήριξης')
+    SPECIFIC_NEEDS_PARALLEL_SUPPORT_DEAF = 'SPECIFIC_NEEDS_PARALLEL_SUPPORT_DEAF', _('Ειδικής Αγωγής - Παράλληλης Στήριξης Κωφών')
+    SPECIFIC_NEEDS_PARALLEL_SUPPORT_BLIND = 'SPECIFIC_NEEDS_PARALLEL_SUPPORT_BLIND', _('Ειδικής Αγωγής - Παράλληλης Στήριξης Τυφλών')
+    VULNERABLE_GROUP = 'VULNERABLE_GROUP', _('Ευπαθών Ομάδων')
+    BY_RESIGNATION = 'BY_RESIGNATION', _('Από παραίτηση')
 
 
 class Entry(models.Model):
@@ -28,12 +42,19 @@ class Entry(models.Model):
     type = models.CharField(default='Κενό', choices=ENTRY_CHOICES, max_length=9, verbose_name='Κενό / Πλεόνασμα')
     priority = models.BooleanField(default=False, verbose_name='Προτεραιότητα')
     description = models.CharField(max_length=128, verbose_name='Παρατηρήσεις', null=True, blank=True)
-
+    variant = models.CharField(
+        max_length=64, 
+        verbose_name=_('Τύπος Κενού / Πλεονάσματος'), 
+        help_text=_('Επιλέξετε το είδος του κενού'), 
+        choices=EntryVariantType.choices,
+        default=EntryVariantType.GENERAL_EDUCATION,
+        null=False
+    )
     class Meta:
         unique_together = (('specialty', 'owner'),)
 
     def __str__(self):
-        return f'{self.specialty} | {self.owner} | {self.hours} | {self.type} | {self.priority} | {self.description}'
+        return f'{self.specialty} ({self.variant}) | {self.owner} | {self.hours} | {self.type} | {self.priority} | {self.description}'
 
     def get_absolute_url(self):
         return reverse('main_app:entry_detail', kwargs={'pk': self.pk})
