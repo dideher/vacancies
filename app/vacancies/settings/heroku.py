@@ -7,6 +7,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 # Email settings
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = 'kena@dideira.gr'
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
