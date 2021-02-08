@@ -1,13 +1,13 @@
 import os
 from vacancies.settings.common import *
 
-DEBUG = False
+DEBUG = True
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # Email settings
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-DEFAULT_FROM_EMAIL = 'no-reply@dideira.gr'
+DEFAULT_FROM_EMAIL = 'no-reply-staging@dideira.gr'
 EMAIL_SUBJECT_PREFIX = '[kena_staging] '
 
 EMAIL_HOST = 'smtp.sendgrid.net'
