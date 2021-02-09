@@ -16,7 +16,6 @@ class HistoryEntry(models.Model):
     hours = models.IntegerField(default=0)
     date_time = models.DateTimeField(default=now, verbose_name='Χρονική σήμανση')
     type = models.CharField(default='Κενό', choices=ENTRY_CHOICES, max_length=9, verbose_name='Κενό / Πλεόνασμα')
-    priority = models.BooleanField(default=False, verbose_name='Προτεραιότητα')
     description = models.CharField(max_length=128, verbose_name='Παρατηρήσεις', null=True, blank=True)
     variant = models.CharField(
         max_length=64, 
@@ -28,4 +27,4 @@ class HistoryEntry(models.Model):
     )
 
     def __str__(self):
-        return f'{self.specialty} | {self.owner} | {self.hours} | {self.type} | {self.priority} | {self.description}'
+        return f'{self.specialty} | {self.owner} | {self.hours} | {self.type} | {self.description}'

@@ -5,9 +5,6 @@
             {% if entry.owner == user %}
                 <h5 class="article-title">
                     {{ entry.specialty }} | {{ entry.hours }} ώρες | {{ entry.type }}
-                    {% if entry.priority %}
-                        | Έχει προτεραιότητα
-                    {% endif %}
                     {% if entry.description != None %}
                         | {{ entry.description }}
                     {% endif %}

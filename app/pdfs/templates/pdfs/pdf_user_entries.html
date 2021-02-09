@@ -76,7 +76,6 @@
         <th style="width: 60">Ειδικότητα</th>
         <th style="width: 200">Είδος</th>
         <th style="text-align: center; width: 5%">Ώρες</th>
-        <th style="text-align: center; width: 15%">Προτεραιότητα</th>
         <th style="width: 200">Παρατηρήσεις</th>
         <!-- <td style="width: 25%">Χρονική σήμανση</td> -->
     </tr>
@@ -88,13 +87,6 @@
             <td>{{ entry.specialty }}</td>
             <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
             <td style="text-align: center">{{ entry.hours }}</td>
-            <td style="text-align: center">
-                {% if entry.priority %}
-                    Ναι
-                {% else %}
-                    Όχι
-                {% endif %}
-            </td>
             <td>
                 {{ entry.description|default_if_none:'' }}
             </td>

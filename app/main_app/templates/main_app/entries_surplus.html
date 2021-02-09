@@ -8,7 +8,6 @@
                 <th scope="col">Ειδικότητα</th>
                 <th scope="col">Τύπος</th>
                 <th scope="col">Ώρες</th>
-                <th scope="col">Προτεραιότητα</th>
                 <th scope="col">Παρατηρήσεις</th>
                 <!-- <td>Χρονική σήμανση</td> -->
                 <th scope="col">Σχολείο</th>
@@ -20,13 +19,6 @@
             <td> {{ entry.specialty.code }} </td>
             <td>{{ entry.get_variant_display }}</td>
             <td> {{ entry.hours }} </td>
-            <td>
-                {% if entry.priority %}
-                    Ναι
-                {% else %}
-                    Όχι
-                {% endif %}
-            </td>
             <td>
                 {{ entry.description|default_if_none:'-' }}
             </td>

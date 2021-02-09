@@ -15,7 +15,6 @@
                     <th scope="col">Ειδικότητα</th>
                     <th scope="col">Τύπος</th>
                     <th scope="col">Ώρες</th>
-                    <th scope="col">Προτεραιότητα</th>
                     <th scope="col">Παρατηρήσεις</th>
                     <th scope="col">Χρονική σήμανση</th>
                 </tr>
@@ -27,13 +26,6 @@
                         <td> {{ entry.specialty }} </td>
                         <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
                         <td> {{ entry.hours }} </td>
-                        <td>
-                            {% if entry.priority %}
-                                Ναι
-                            {% else %}
-                                Όχι
-                            {% endif %}
-                        </td>
                         <td>
                             {% if entry.description != None %}
                                 {{ entry.description }}

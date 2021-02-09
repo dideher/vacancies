@@ -41,7 +41,6 @@ class Entry(models.Model):
                                 verbose_name='Ώρες')
     date_time = models.DateTimeField(auto_now=True, verbose_name='Χρονική σήμανση')
     type = models.CharField(default='Κενό', choices=ENTRY_CHOICES, max_length=9, verbose_name='Κενό / Πλεόνασμα')
-    priority = models.BooleanField(default=False, verbose_name='Προτεραιότητα')
     description = models.CharField(max_length=128, verbose_name='Παρατηρήσεις', null=True, blank=True)
     variant = models.CharField(
         max_length=64, 
@@ -67,7 +66,7 @@ class Entry(models.Model):
         
     
     def __str__(self):
-        return f'{self.specialty} ({self.variant}) | {self.owner} | {self.hours} | {self.type} | {self.priority} | {self.description}'
+        return f'{self.specialty} ({self.variant}) | {self.owner} | {self.hours} | {self.type} | {self.description}'
 
     def get_absolute_url(self):
         return reverse('main_app:entry_detail', kwargs={'pk': self.pk})

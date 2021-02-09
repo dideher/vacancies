@@ -180,10 +180,10 @@ def excel_entries(request):
         entries = Entry.objects.all().order_by('specialty')
 
         data = list()
-        header = ['Ειδικότητα', 'Ώρες', 'Είδος', 'Προτεραιότητα', 'Παρατηρήσεις', 'Χρονική σήμανση', 'Σχολείο']
+        header = ['Ειδικότητα', 'Ώρες', 'Είδος', 'Παρατηρήσεις', 'Χρονική σήμανση', 'Σχολείο']
         data.append(header)
         for entry in entries:
-            row = [entry.specialty.code, entry.hours, entry.type, entry.priority, entry.description, entry.date_time,
+            row = [entry.specialty.code, entry.hours, entry.type, entry.description, entry.date_time,
                    entry.owner.last_name]
             data.append(row)
 
@@ -197,10 +197,10 @@ def excel_history(request):
         entries = HistoryEntry.objects.all().order_by('owner', 'specialty')
 
         data = list()
-        header = ['Σχολείο', 'Ειδικότητα', 'Ώρες', 'Είδος', 'Προτεραιότητα', 'Παρατηρήσεις', 'Χρονική σήμανση']
+        header = ['Σχολείο', 'Ειδικότητα', 'Ώρες', 'Είδος', 'Παρατηρήσεις', 'Χρονική σήμανση']
         data.append(header)
         for entry in entries:
-            row = [entry.owner.last_name, entry.specialty.code, entry.hours, entry.type, entry.priority,
+            row = [entry.owner.last_name, entry.specialty.code, entry.hours, entry.type,
                    entry.description, entry.date_time]
             data.append(row)
 
@@ -213,10 +213,10 @@ def excel_user_history(request):
     entries = HistoryEntry.objects.filter(owner=request.user)
 
     data = list()
-    header = ['Σχολείο', 'Ειδικότητα', 'Ώρες', 'Είδος', 'Προτεραιότητα', 'Παρατηρήσεις', 'Χρονική σήμανση']
+    header = ['Σχολείο', 'Ειδικότητα', 'Ώρες', 'Είδος', 'Παρατηρήσεις', 'Χρονική σήμανση']
     data.append(header)
     for entry in entries:
-        row = [entry.owner.last_name, entry.specialty.code, entry.hours, entry.type, entry.priority,
+        row = [entry.owner.last_name, entry.specialty.code, entry.hours, entry.type,
                entry.description, entry.date_time]
         data.append(row)
 
