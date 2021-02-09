@@ -8,26 +8,26 @@
         {% else %}
             <h3>Καταχωρίσεις</h3>
 
-            <table class="table table-hover">
-                <thead>
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
                 <tr>
-                    <td>Ειδικότητα</td>
-                    <td>Ώρες</td>
-                    <td>Είδος</td>
-                    <td>Τύπος</td>
-                    <td>Προτεραιότητα</td>
-                    <td>Παρατηρήσεις</td>
-                    <td>Χρονική σήμανση</td>
-                    <td>Επεξεργασία</td>
+                    <th scope="col">#</th>
+                    <th scope="col">Ειδικότητα</th>
+                    <th scope="col">Τύπος</th>
+                    <th scope="col">Ώρες</th>
+                    <th scope="col">Προτεραιότητα</th>
+                    <th scope="col">Παρατηρήσεις</th>
+                    <!-- <td>Χρονική σήμανση</td> -->
+                    <th scope="col">Επεξεργασία</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for entry in entries %}
                     <tr>
-                        <td> {{ entry.specialty }} </td>
+                        <td><strong>{{forloop.counter}}</strong></td>
+                        <td> {{ entry.specialty }}</td>
+                        <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
                         <td> {{ entry.hours }} </td>
-                        <td> {{ entry.type }} </td>
-                        <td> {{ entry.get_variant_display }} </td>
                         <td>
                             {% if entry.priority %}
                                 Ναι
@@ -36,13 +36,9 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if entry.description != None %}
-                                {{ entry.description }}
-                            {% else %}
-                                -
-                            {% endif %}
+                            {{ entry.description|default_if_none:'-' }}
                         </td>
-                        <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td>
+                        <!-- <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td> -->
                         <td>
                             <a class="btn btn-secondary btn-sm mt-1 mb-1"
                                href="{% url 'main_app:entry_update' entry.id %}">Τροποποίηση</a>
