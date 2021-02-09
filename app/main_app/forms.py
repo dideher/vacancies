@@ -6,7 +6,7 @@ from main_app.models import Specialty
 class EntryCreateForm(forms.ModelForm):
     class Meta:
         model = Entry
-        fields = ['specialty', 'type', 'variant', 'hours', 'priority', 'description']
+        fields = ['specialty', 'type', 'variant', 'hours', 'description']
         widgets = {
             'type': forms.RadioSelect,
         }
@@ -25,7 +25,7 @@ class EntryCreateForm(forms.ModelForm):
 class EntryUpdateForm(forms.ModelForm):
     class Meta:
         model = Entry
-        fields = ['type', 'variant', 'hours', 'priority', 'description']
+        fields = ['type', 'variant', 'hours', 'description']
         widgets = {
             'type': forms.RadioSelect,
         }

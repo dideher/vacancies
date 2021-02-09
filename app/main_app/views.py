@@ -33,7 +33,7 @@ class EntryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         self.request.user.profile.save()
         HistoryEntry.objects.create(specialty=original_data.specialty, owner=original_data.owner,
                                     hours=original_data.hours, date_time=original_data.date_time,
-                                    type=original_data.type, priority=original_data.priority,
+                                    type=original_data.type,
                                     description=original_data.description, variant=original_data.variant)
 
         return super(EntryDeleteView, self).delete(*args, **kwargs)
@@ -141,7 +141,7 @@ class EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         self.request.user.profile.save()
         HistoryEntry.objects.create(specialty=original_data.specialty, owner=original_data.owner,
                                     hours=original_data.hours, date_time=original_data.date_time,
-                                    type=original_data.type, priority=original_data.priority,
+                                    type=original_data.type,
                                     description=original_data.description, variant=original_data.variant)
 
         return super().form_valid(form)
