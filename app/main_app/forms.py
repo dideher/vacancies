@@ -14,10 +14,13 @@ class EntryCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super(EntryCreateForm, self).__init__(*args, **kwargs)
-        user_entries_specialties = Entry.objects.filter(owner=user).only('specialty')
-        self.fields['specialty'].queryset = Specialty.objects.all().exclude(
-            pk__in=[e.specialty.pk for e in user_entries_specialties])
 
+    # def full_clean(self):
+    #     super().full_clean()
+    #     try:
+    #         self.instance.validate_unique()
+    #     except forms.ValidationError as e:
+    #         self._update_errors(e)
 
 class EntryUpdateForm(forms.ModelForm):
     class Meta:

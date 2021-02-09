@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 class Specialty(models.Model):
@@ -51,8 +52,20 @@ class Entry(models.Model):
         null=False
     )
     class Meta:
-        unique_together = (('specialty', 'owner'),)
-
+        constraints = [
+            models.UniqueConstraint(fields=['owner', 'specialty', 'variant'], name='unique_variant_entry')
+        ]
+        
+    def validate_unique(self, exclude=None):
+        qs = self.__class__.objects.filter(specialty=self.specialty, variant=self.variant)
+        if self.pk is None:
+            # we are not updating, so go ahead
+            if qs.filter(owner=self.owner).exists():
+                raise ValidationError({'variant': 
+                                    _(f'Υπάρχει ήδη καταχωρημένο κενό/πλεόνοσμα με αυτόν τον τύπο για την ειδικότητα {self.specialty}')})
+            
+        
+    
     def __str__(self):
         return f'{self.specialty} ({self.variant}) | {self.owner} | {self.hours} | {self.type} | {self.priority} | {self.description}'
 
