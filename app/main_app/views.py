@@ -112,17 +112,20 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super(EntryCreateView, self).get_form_kwargs()
+        # https://stackoverflow.com/questions/32260785/django-validating-unique-together-constraints-in-a-modelform-with-excluded-fiel
+        kwargs['instance'] = Entry(owner=self.request.user)
         kwargs['user'] = self.request.user
 
         return kwargs
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user
+        # Setting form.instance.user in form_valid is too late, because the 
+        # form has already been validated by then.
+        #form.instance.owner = self.request.user
         self.request.user.profile.status = False
         self.request.user.profile.save()
 
         return super().form_valid(form)
-
 
 class EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Entry
