@@ -2,24 +2,24 @@
 {% block content %}
     <h3>Κενά</h3>
 
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <td>Ειδικότητα</td>
-            <td>Ώρες</td>
-            <td>Είδος</td>
-            <td>Προτεραιότητα</td>
-            <td>Παρατηρήσεις</td>
-            <td>Χρονική σήμανση</td>
-            <td>Σχολείο</td>
-        </tr>
+    <table class="table table-hover table-sm">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">Ειδικότητα</th>
+                <th scope="col">Τύπος</th>
+                <th scope="col">Ώρες</th>
+                <th scope="col">Προτεραιότητα</th>
+                <th scope="col">Παρατηρήσεις</th>
+                <!-- <td>Χρονική σήμανση</td> -->
+                <th scope="col">Σχολείο</th>
+            </tr>
         </thead>
         <tbody>
-        {% for entry in entries %}
+            {% for entry in entries %}
             <tr>
-                <td> {{ entry.specialty.code }} </td>
+                <td>{{ entry.specialty.code }} </td>
+                <td>{{ entry.get_variant_display }}</td>
                 <td> {{ entry.hours }} </td>
-                <td> {{ entry.type }} </td>
                 <td>
                     {% if entry.priority %}
                         Ναι
@@ -28,13 +28,9 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if entry.description != None %}
-                        {{ entry.description }}
-                    {% else %}
-                        -
-                    {% endif %}
+                    {{ entry.description|default_if_none:'-' }}
                 </td>
-                <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td>
+                <!-- <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td> -->
                 <td> {{ entry.owner.last_name }} </td>
             </tr>
         {% endfor %}
