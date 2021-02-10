@@ -52,7 +52,7 @@ class EntriesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'main_app/entries.html'
     context_object_name = 'entries'
     ordering = ['specialty', 'owner']
-    paginate_by = 5
+    paginate_by = 10
 
     def test_func(self):
         if self.request.user.is_superuser:
@@ -64,7 +64,7 @@ class EntriesVacanciesListView(LoginRequiredMixin, UserPassesTestMixin, ListView
     model = Entry
     template_name = 'main_app/entries_vacancies.html'
     context_object_name = 'entries'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         return Entry.objects.filter(type='Κενό', hours__gt=0).order_by('specialty', 'owner')
@@ -79,7 +79,7 @@ class EntriesSurplusListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Entry
     template_name = 'main_app/entries_surplus.html'
     context_object_name = 'entries'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         return Entry.objects.filter(type='Πλεόνασμα', hours__gt=0).order_by('specialty', 'owner')
@@ -94,7 +94,7 @@ class UserEntriesListView(LoginRequiredMixin, ListView):
     model = Entry
     template_name = 'main_app/user_entries.html'
     context_object_name = 'entries'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         return Entry.objects.filter(owner=self.request.user).order_by('specialty')
