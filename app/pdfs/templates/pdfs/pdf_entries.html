@@ -80,7 +80,7 @@
                 <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
                 <td style="text-align: center">{{ entry.hours }}</td>
                 <td>
-                    {{ entry.description|default_if_none:'-' }}
+                    {{ entry.description|default:'-' }}
                 </td>
                 <!-- <td>{{ entry.date_time|date:'Y-m-d@H:i' }}</td> -->
             </tr>

@@ -40,8 +40,11 @@ class Entry(models.Model):
                                 help_text="Η τιμή πρέπει να είναι μεγαλύτερη του 0.",
                                 verbose_name='Ώρες')
     date_time = models.DateTimeField(auto_now=True, verbose_name='Χρονική σήμανση')
-    type = models.CharField(default='Κενό', choices=ENTRY_CHOICES, max_length=9, verbose_name='Κενό / Πλεόνασμα')
-    description = models.CharField(max_length=128, verbose_name='Παρατηρήσεις', null=True, blank=True)
+    type = models.CharField(default='Κενό', choices=ENTRY_CHOICES, 
+                            max_length=9, verbose_name='Κενό / Πλεόνασμα')
+    description = models.TextField(verbose_name='Παρατηρήσεις', blank=True, 
+                                   help_text='Καταχωρήστε τυχόν παρατηρήσεις που μπορεί να έχετε για το συγεκριμένο κενό/πλαιόνασμα', 
+                                   default='')
     variant = models.CharField(
         max_length=64, 
         verbose_name=_('Τύπος Κενού / Πλεονάσματος'), 
