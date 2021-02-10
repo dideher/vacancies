@@ -16,7 +16,7 @@ class HistoryEntry(models.Model):
     hours = models.IntegerField(default=0)
     date_time = models.DateTimeField(default=now, verbose_name='Χρονική σήμανση')
     type = models.CharField(default='Κενό', choices=ENTRY_CHOICES, max_length=9, verbose_name='Κενό / Πλεόνασμα')
-    description = models.CharField(max_length=128, verbose_name='Παρατηρήσεις', null=True, blank=True)
+    description = models.TextField(verbose_name='Παρατηρήσεις', blank=True)
     variant = models.CharField(
         max_length=64, 
         verbose_name=_('Τύπος Κενού / Πλεονάσματος'), 
