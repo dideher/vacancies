@@ -9,6 +9,7 @@ class EntryCreateForm(forms.ModelForm):
         fields = ['specialty', 'type', 'variant', 'hours', 'description']
         widgets = {
             'type': forms.RadioSelect,
+            'description': forms.Textarea(attrs={'rows': 3}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -28,4 +29,5 @@ class EntryUpdateForm(forms.ModelForm):
         fields = ['type', 'variant', 'hours', 'description']
         widgets = {
             'type': forms.RadioSelect,
+            'description': forms.Textarea(attrs={'rows': 3}),
         }
