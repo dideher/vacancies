@@ -14,8 +14,8 @@ class Specialty(models.Model):
 
 class EntryVariantType(models.TextChoices):
     
-    GENERAL_EDUCATION = 'GENERAL_EDUCATION', _('Γενικής Παιδείας για μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
-    GENERAL_EDUCATION_WITH_EXAMS = 'GENERAL_EDUCATION_WITH_EXAMS', _('Γενικής Παιδείας για Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+    GENERAL_EDUCATION = 'GENERAL_EDUCATION', _('Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+    GENERAL_EDUCATION_WITH_EXAMS = 'GENERAL_EDUCATION_WITH_EXAMS', _('Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
     SPECIFIC_NEEDS_SMEAE = 'SPECIFIC_NEEDS_SMEAE', _('Ειδικής Αγωγής - ΣΜΕΑΕ')
     SPECIFIC_NEEDS_INTEGRATION_CLASS = 'SPECIFIC_NEEDS_INTEGRATION_CLASS', _('Ειδικής Αγωγής - Τμήμα Ένταξης')
     SPECIFIC_NEEDS_INTEGRATION_CLASS_DEAF = 'SPECIFIC_NEEDS_INTEGRATION_CLASS_DEAF', _('Ειδικής Αγωγής - Τμήμα Ένταξης Κωφών')
