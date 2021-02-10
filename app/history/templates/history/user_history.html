@@ -8,36 +8,24 @@
         {% else %}
             <h3>Ιστορικό Καταχωρίσεων</h3>
 
-            <table class="table table-hover">
-                <thead>
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
                 <tr>
-                    <td>Ειδικότητα</td>
-                    <td>Ώρες</td>
-                    <td>Είδος</td>
-                    <td>Προτεραιότητα</td>
-                    <td>Παρατηρήσεις</td>
-                    <td>Χρονική σήμανση</td>
+                    <th scope="col">Ειδικότητα</th>
+                    <th scope="col">Τύπος</th>
+                    <th scope="col">Ώρες</th>
+                    <th scope="col">Παρατηρήσεις</th>
+                    <th scope="col">Χρονική σήμανση</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for entry in history %}
                     <tr>
                         <td> {{ entry.specialty }} </td>
+                        <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
                         <td> {{ entry.hours }} </td>
-                        <td> {{ entry.type }} </td>
-                        <td>
-                            {% if entry.priority %}
-                                Ναι
-                            {% else %}
-                                Όχι
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if entry.description != None %}
-                                {{ entry.description }}
-                            {% else %}
-                                -
-                            {% endif %}
+                        <td data-toggle="tooltip" data-placement="left" title="{{entry.description|default:''}}">
+                            {{ entry.description|default:'-'|truncatechars:10 }}
                         </td>
                         <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td>
                     </tr>

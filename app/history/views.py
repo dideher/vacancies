@@ -9,7 +9,7 @@ class HistoryListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'history/history.html'
     context_object_name = 'history'
     ordering = ['owner', 'specialty']
-    paginate_by = 5
+    paginate_by = 10
 
     def test_func(self):
         if self.request.user.is_superuser:
@@ -22,7 +22,7 @@ class UserHistoryListView(LoginRequiredMixin, ListView):
     model = HistoryEntry
     template_name = 'history/user_history.html'
     context_object_name = 'history'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         return HistoryEntry.objects.filter(owner=self.request.user).order_by('date_time')

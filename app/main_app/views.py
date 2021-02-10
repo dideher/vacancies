@@ -33,8 +33,8 @@ class EntryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         self.request.user.profile.save()
         HistoryEntry.objects.create(specialty=original_data.specialty, owner=original_data.owner,
                                     hours=original_data.hours, date_time=original_data.date_time,
-                                    type=original_data.type, priority=original_data.priority,
-                                    description=original_data.description)
+                                    type=original_data.type,
+                                    description=original_data.description, variant=original_data.variant)
 
         return super(EntryDeleteView, self).delete(*args, **kwargs)
 
@@ -52,7 +52,7 @@ class EntriesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'main_app/entries.html'
     context_object_name = 'entries'
     ordering = ['specialty', 'owner']
-    paginate_by = 5
+    paginate_by = 10
 
     def test_func(self):
         if self.request.user.is_superuser:
@@ -64,7 +64,7 @@ class EntriesVacanciesListView(LoginRequiredMixin, UserPassesTestMixin, ListView
     model = Entry
     template_name = 'main_app/entries_vacancies.html'
     context_object_name = 'entries'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         return Entry.objects.filter(type='Κενό', hours__gt=0).order_by('specialty', 'owner')
@@ -79,7 +79,7 @@ class EntriesSurplusListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Entry
     template_name = 'main_app/entries_surplus.html'
     context_object_name = 'entries'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         return Entry.objects.filter(type='Πλεόνασμα', hours__gt=0).order_by('specialty', 'owner')
@@ -94,7 +94,7 @@ class UserEntriesListView(LoginRequiredMixin, ListView):
     model = Entry
     template_name = 'main_app/user_entries.html'
     context_object_name = 'entries'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         return Entry.objects.filter(owner=self.request.user).order_by('specialty')
@@ -112,17 +112,20 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super(EntryCreateView, self).get_form_kwargs()
+        # https://stackoverflow.com/questions/32260785/django-validating-unique-together-constraints-in-a-modelform-with-excluded-fiel
+        kwargs['instance'] = Entry(owner=self.request.user)
         kwargs['user'] = self.request.user
 
         return kwargs
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user
+        # Setting form.instance.user in form_valid is too late, because the 
+        # form has already been validated by then.
+        #form.instance.owner = self.request.user
         self.request.user.profile.status = False
         self.request.user.profile.save()
 
         return super().form_valid(form)
-
 
 class EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Entry
@@ -138,8 +141,8 @@ class EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         self.request.user.profile.save()
         HistoryEntry.objects.create(specialty=original_data.specialty, owner=original_data.owner,
                                     hours=original_data.hours, date_time=original_data.date_time,
-                                    type=original_data.type, priority=original_data.priority,
-                                    description=original_data.description)
+                                    type=original_data.type,
+                                    description=original_data.description, variant=original_data.variant)
 
         return super().form_valid(form)
 
