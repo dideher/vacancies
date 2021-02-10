@@ -19,7 +19,7 @@
                 <td> {{ entry.specialty.code }} </td>
                 <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
                 <td> {{ entry.hours }} </td>
-                <<td data-toggle="tooltip" data-placement="left" title="{{entry.description|default:''}}">
+                <td data-toggle="tooltip" data-placement="left" title="{{entry.description|default:''}}">
                     {{ entry.description|default:'-'|truncatechars:10 }}
                 </td>
                 <!-- <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td> -->
