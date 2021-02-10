@@ -64,7 +64,7 @@ class Entry(models.Model):
             # we are not updating, so go ahead
             if qs.filter(owner=self.owner).exists():
                 raise ValidationError({'variant': 
-                                    _(f'Υπάρχει ήδη καταχωρημένο κενό/πλεόνοσμα με αυτόν τον τύπο για την ειδικότητα {self.specialty}')})
+                                    _(f'Υπάρχει ήδη καταχωρισμένο κενό/πλεόνοσμα με αυτόν τον τύπο για την ειδικότητα {self.specialty}')})
             
         
     
