@@ -26,12 +26,8 @@
                         <td> {{ entry.specialty }} </td>
                         <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
                         <td> {{ entry.hours }} </td>
-                        <td>
-                            {% if entry.description != None %}
-                                {{ entry.description }}
-                            {% else %}
-                                -
-                            {% endif %}
+                        <td data-toggle="tooltip" data-placement="left" title="{{entry.description|default:''}}">
+                            {{ entry.description|default:'-'|truncatechars:10 }}
                         </td>
                         <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td>
                     </tr>
