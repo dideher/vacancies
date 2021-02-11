@@ -1,0 +1,15 @@
+{% extends "main_app/base.html" %}
+{% load static %}
+{% block content %}
+    <article class="media content-section">
+        <div class="media-body">
+            <h3 class="article-title">Εγχειρίδιο Χρήσης</h3>
+            <p></p>
+            <p>
+                Για την διευκόλυνση των σχολικών μονάδων ως προς την χρήση της εφαρμογής,
+                έχουμε συντάξη τον παρακάτω <a href="{% static '/user-guide.docx' %}">σύντομο οδηγό χρήσης</a>
+                το οποίον σας συστήνουμε να διαβάσετε.
+            </p>
+        </div>
+    </article>
+{% endblock content %}

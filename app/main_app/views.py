@@ -162,6 +162,8 @@ def about(request):
 def home(request):
     return render(request, 'main_app/home.html', {'title': 'Αρχική'})
 
+def help(request):
+    return render(request, 'main_app/help.html', {'title': 'Εγχειρίδιο Χρήσης'})
 
 def clear_entries(request):
     if request.method == 'POST':
