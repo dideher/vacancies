@@ -25,6 +25,8 @@ class EntryVariantType(models.TextChoices):
     SPECIFIC_NEEDS_PARALLEL_SUPPORT_BLIND = 'SPECIFIC_NEEDS_PARALLEL_SUPPORT_BLIND', _('Ειδικής Αγωγής - Παράλληλης Στήριξης Τυφλών')
     VULNERABLE_GROUP = 'VULNERABLE_GROUP', _('Ευπαθών Ομάδων')
     BY_RESIGNATION = 'BY_RESIGNATION', _('Από παραίτηση')
+    RECEPTION_CLASSES = 'RECEPTION_CLASSES', _('Τάξεις Υποδοχής')
+    A_NEW_START = 'A_NEW_START', _('Μ.Ν.Α.Ε.')
 
 
 class Entry(models.Model):
