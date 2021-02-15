@@ -66,9 +66,9 @@
         <tr>
             <th style="text-align: center; width: 5%">Α/Α</th>
             <th style="width: 60">Ειδικότητα</th>
-            <th style="width: 200">Είδος</th>
+            <th style="width: 40%">Είδος</th>
             <th style="text-align: center; width: 5%">Ώρες</th>
-            <th style="width: 200">Παρατηρήσεις</th>
+            <th style="text-align: center;">Παρατηρήσεις</th>
             <!-- <td style="width: 25%">Χρονική σήμανση</td> -->
         </tr>
         </thead>
@@ -79,8 +79,8 @@
                 <td>{{ entry.specialty }}</td>
                 <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
                 <td style="text-align: center">{{ entry.hours }}</td>
-                <td>
-                    {{ entry.description|default:'-' }}
+                <td style="text-align: right">
+                    {{ entry.description|default:'-'|truncatechars:120 }}
                 </td>
                 <!-- <td>{{ entry.date_time|date:'Y-m-d@H:i' }}</td> -->
             </tr>
