@@ -62,10 +62,13 @@ def check_status(request):
     if request.user.is_superuser:
         superusers = User.objects.filter(is_superuser=True)
         p_status_true = Profile.objects.filter(status=True).exclude(user__in=superusers)
-        p_status_false = Profile.objects.filter(status=False).exclude(user__in=superusers).exclude(verified=False)
-
+        u_status_false = User.objects.filter(profile__status=False).exclude(pk__in=superusers).exclude(profile__verified=False)
+        s_status_false = School.objects.filter(email__in=[u.email for u in u_status_false])
+        # u_status_true = User.objects.filter(profile__status=True).exclude(pk__in=superusers).exclude(profile__verified=False)
+        # s_status_true = School.objects.filter(email__in=[u.email for u in u_status_true])
+        
         return render(request, 'schools/check_status.html', {'p_status_true': p_status_true,
-                                                             'p_status_false': p_status_false,
+                                                             's_status_false': s_status_false,
                                                              })
     else:
         return render(request, 'main_app/error.html', {})
