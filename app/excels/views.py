@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_protect
 import openpyxl
 from excel_response import ExcelResponse
 from .forms import UploadFileForm
-from main_app.models import Entry, Specialty
+from main_app.models import Entry, Specialty, EntryVariantType
 from schools.models import School
 from users.models import Profile
 from django.contrib import messages
@@ -180,11 +180,17 @@ def excel_entries(request):
         entries = Entry.objects.all().order_by('specialty')
 
         data = list()
-        header = ['Ειδικότητα', 'Ώρες', 'Είδος', 'Παρατηρήσεις', 'Χρονική σήμανση', 'Σχολείο']
+        header = [
+                    'Σχολείο', 'Ειδικότητα',  'Είδος', 'Τύπος', 'Ώρες', 
+                    'Παρατηρήσεις', 'Χρονική σήμανση'
+        ]
         data.append(header)
         for entry in entries:
-            row = [entry.specialty.code, entry.hours, entry.type, entry.description, entry.date_time,
-                   entry.owner.last_name]
+            row = [
+                entry.owner.last_name, entry.specialty.code, entry.type, 
+                str(EntryVariantType(entry.variant).label), entry.hours, 
+                entry.description, entry.date_time,
+            ]
             data.append(row)
 
         return ExcelResponse(data, 'entries')
@@ -197,11 +203,17 @@ def excel_history(request):
         entries = HistoryEntry.objects.all().order_by('owner', 'specialty')
 
         data = list()
-        header = ['Σχολείο', 'Ειδικότητα', 'Ώρες', 'Είδος', 'Παρατηρήσεις', 'Χρονική σήμανση']
+        header = [
+            'Σχολείο', 'Ειδικότητα', 'Είδος', 'Τύπος', 'Ώρες', 
+            'Παρατηρήσεις', 'Χρονική σήμανση'
+        ]
         data.append(header)
         for entry in entries:
-            row = [entry.owner.last_name, entry.specialty.code, entry.hours, entry.type,
-                   entry.description, entry.date_time]
+            row = [
+                entry.owner.last_name, entry.specialty.code, entry.type,
+                str(EntryVariantType(entry.variant).label), entry.hours,
+                entry.description, entry.date_time
+            ]
             data.append(row)
 
         return ExcelResponse(data, 'history')
