@@ -79,8 +79,8 @@
                 <td>{{ entry.specialty }}</td>
                 <td>{{ entry.type }} - {{ entry.get_variant_display }}</td>
                 <td style="text-align: center">{{ entry.hours }}</td>
-                <td style="text-align: right">
-                    {{ entry.description|default:'-'|truncatechars:120 }}
+                <td style="text-align: left">
+                    {{ entry.description|default:'-' }}
                 </td>
                 <!-- <td>{{ entry.date_time|date:'Y-m-d@H:i' }}</td> -->
             </tr>
