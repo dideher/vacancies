@@ -20,7 +20,7 @@ class PdfEntries(PdfMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
 
     def get_queryset(self):
         entries = list()
-        for p in Profile.objects.filter(verified=True).order_by('owner'):
+        for p in Profile.objects.filter(verified=True).order_by('user__last_name'):
             ue = Entry.objects.filter(owner=p.user)
             if ue is not None:
                 entries.append([p, ue])
@@ -40,7 +40,7 @@ class PdfHistory(PdfMixin, LoginRequiredMixin, UserPassesTestMixin, ListView):
 
     def get_queryset(self):
         history = list()
-        for p in Profile.objects.filter(verified=True).order_by('owner'):
+        for p in Profile.objects.filter(verified=True).order_by('user__last_name'):
             uh = HistoryEntry.objects.filter(owner=p.user)
             if uh is not None:
                 history.append([p, uh])
