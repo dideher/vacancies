@@ -45,7 +45,7 @@ class Entry(models.Model):
     type = models.CharField(default='Κενό', choices=ENTRY_CHOICES, 
                             max_length=9, verbose_name='Κενό / Πλεόνασμα')
     description = models.TextField(verbose_name='Παρατηρήσεις', blank=True, 
-                                   help_text='Καταχωρήστε τυχόν παρατηρήσεις που μπορεί να έχετε για το συγεκριμένο κενό/πλαιόνασμα', 
+                                   help_text='Καταχωρήστε τυχόν παρατηρήσεις που μπορεί να έχετε για το συγεκριμένο κενό/πλεόνασμα', 
                                    default='')
     variant = models.CharField(
         max_length=64, 
