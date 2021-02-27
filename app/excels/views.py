@@ -181,14 +181,14 @@ def excel_entries(request):
 
         data = list()
         header = [
-                    'Σχολείο', 'Ειδικότητα',  'Είδος', 'Τύπος', 'Ώρες', 
-                    'Παρατηρήσεις', 'Χρονική σήμανση'
+            'Σχολείο', 'Ειδικότητα', 'Είδος', 'Τύπος', 'Ώρες',
+            'Παρατηρήσεις', 'Χρονική σήμανση'
         ]
         data.append(header)
         for entry in entries:
             row = [
-                entry.owner.last_name, entry.specialty.code, entry.type, 
-                str(EntryVariantType(entry.variant).label), entry.hours, 
+                entry.owner.last_name, entry.specialty.code, entry.type,
+                str(EntryVariantType(entry.variant).label), entry.hours,
                 entry.description, entry.date_time,
             ]
             data.append(row)
@@ -204,7 +204,7 @@ def excel_history(request):
 
         data = list()
         header = [
-            'Σχολείο', 'Ειδικότητα', 'Είδος', 'Τύπος', 'Ώρες', 
+            'Σχολείο', 'Ειδικότητα', 'Είδος', 'Τύπος', 'Ώρες',
             'Παρατηρήσεις', 'Χρονική σήμανση'
         ]
         data.append(header)
@@ -239,27 +239,27 @@ def reconnect_users_to_schools():
     profiles = Profile.objects.all()
 
     for profile in profiles:
-            school = School.objects.filter(email=profile.user.email).first()
+        school = School.objects.filter(email=profile.user.email).first()
 
-            if school != None:
-                profile.user.last_name = school.name
-                profile.user.save()
-                profile.verified = True
-                profile.save()
-                school.connected_to_user = True
-                school.save()
+        if school != None:
+            profile.user.last_name = school.name
+            profile.user.save()
+            profile.verified = True
+            profile.save()
+            school.connected_to_user = True
+            school.save()
 
 
 def reconnect_nv_users_to_schools():
     profiles = Profile.objects.filter(verified=False)
 
     for profile in profiles:
-            school = School.objects.filter(email=profile.user.email).first()
+        school = School.objects.filter(email=profile.user.email).first()
 
-            if school != None:
-                profile.user.last_name = school.name
-                profile.user.save()
-                profile.verified = True
-                profile.save()
-                school.connected_to_user = True
-                school.save()
+        if school != None:
+            profile.user.last_name = school.name
+            profile.user.save()
+            profile.verified = True
+            profile.save()
+            school.connected_to_user = True
+            school.save()
