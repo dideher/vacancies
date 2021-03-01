@@ -26,8 +26,9 @@ class EntryVariantType(models.TextChoices):
     VULNERABLE_GROUP = 'VULNERABLE_GROUP', _('Ευπαθών Ομάδων')
     BY_RESIGNATION = 'BY_RESIGNATION', _('Από παραίτηση')
     RECEPTION_CLASSES = 'RECEPTION_CLASSES', _('Τάξεις Υποδοχής')
-    A_NEW_START = 'A_NEW_START', _('Μ.Ν.Α.Ε.')
-
+    A_NEW_START = 'A_NEW_START', _('Μ.Ν.Α.Ε.'),
+    MUSICAL_SOME_TYPE = 'MUSICAL_SOME_TYPE', _('Ειδικός Τύπος για Μουσικά Σχολεία')
+    
 
 class Entry(models.Model):
     ENTRY_CHOICES = (
@@ -51,7 +52,6 @@ class Entry(models.Model):
         max_length=64, 
         verbose_name=_('Τύπος Κενού / Πλεονάσματος'), 
         help_text=_('Επιλέξετε το είδος του κενού'), 
-        choices=EntryVariantType.choices,
         default=EntryVariantType.GENERAL_EDUCATION,
         null=False
     )
