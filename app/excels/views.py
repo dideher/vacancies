@@ -235,13 +235,21 @@ def excel_user_history(request):
     return ExcelResponse(data, 'user_history')
 
 
-def reconnect_users_to_schools():
-    profiles = Profile.objects.all()  # type: list[Profile]
+def reconnect_users_to_schools(user=None):
+    # type: (User) -> List[Profile]
+    if user is None:
+        # we are working for all users
+        profiles = Profile.objects.all()  # type: list[Profile]
+    else:
+        profiles = [user.profile, ]  # type: list[Profile]
+
+    # store the associated (actually processed) users/profile in a list
+    associated_users = list()
 
     for profile in profiles:
-        school = School.objects.filter(email=profile.user.email).first()  # type: School
+        try:
+            school = School.objects.get(email=profile.user.email)  # type: School
 
-        if school is not None:
             profile.user.last_name = school.name
             profile.user.save()
 
@@ -249,16 +257,24 @@ def reconnect_users_to_schools():
             profile.school = school
             profile.save()
 
+            associated_users.append(profile)
+        except School.DoesNotExist:
+            pass
+
+    return associated_users
+
 
 def reconnect_nv_users_to_schools():
     profiles = Profile.objects.filter(verified=False)  # type: list[Profile]
 
     for profile in profiles:
-        school = School.objects.filter(email=profile.user.email).first()  # type: School
+        try:
+            school = School.objects.get(email=profile.user.email)  # type: School
 
-        if school is not None:
             profile.user.last_name = school.name
             profile.user.save()
 
             profile.verified = True
             profile.save()
+        except School.DoesNotExist:
+            pass
