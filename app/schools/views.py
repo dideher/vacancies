@@ -35,7 +35,7 @@ def check_schools(request):
         superusers = User.objects.filter(is_superuser=True)
         p_verified_users = Profile.objects.filter(verified=True).exclude(user__in=superusers)
         p_not_verified_users = Profile.objects.filter(verified=False).exclude(user__in=superusers)
-        not_connected_schools = School.objects.filter(connected_to_user=False)
+        not_connected_schools = School.objects.filter(managed_by=None)
 
         return render(request, 'schools/check_schools.html', {'p_verified_users': p_verified_users,
                                                               'p_not_verified_users': p_not_verified_users,

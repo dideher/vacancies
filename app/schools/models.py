@@ -24,11 +24,10 @@ class SchoolVariant(models.TextChoices):
 
 class School(models.Model):
     email = models.EmailField(unique=True, null=True, verbose_name='Email Σχολείου')
-    name = models.CharField(max_length=100, null=True, verbose_name='Σχολείο')
+    name = models.CharField(max_length=100, null=True, verbose_name='Όνομα Σχολείου')
     principal = models.CharField(max_length=100, null=True, verbose_name='Διευθυντής Σχολείου')
     phone = models.CharField(max_length=15, null=True, verbose_name='Τηλέφωνο Σχολείου')
-    address = models.CharField(max_length=100, null=True, verbose_name='Τηλέφωνο Σχολείου')
-    connected_to_user = models.BooleanField(default=False, verbose_name='Σύνδεση με χρήστη')
+    address = models.CharField(max_length=100, null=True, verbose_name='Διεύθυνση Σχολείου')
     school_type = models.CharField(
         max_length=16,
         verbose_name=_('Έιδος Σχολείου'),
