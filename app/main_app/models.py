@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from schools.models import School
 
 
 class Specialty(models.Model):
@@ -83,7 +84,7 @@ class Entry(models.Model):
         ('Κενό', 'Κενό'),
         ('Πλεόνασμα', 'Πλεόνασμα')
     )
-
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='entries', null=True, default=None)
     specialty = models.ForeignKey(Specialty, on_delete=models.CASCADE, verbose_name='Ειδικότητα', null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     hours = models.IntegerField(default=0, validators=[MinValueValidator(1)],
