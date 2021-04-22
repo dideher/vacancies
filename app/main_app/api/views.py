@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework import permissions
 from schools.models import School
+from users.models import Profile
 from main_app.models import Entry, Specialty
 from .serializers import SchoolSerializer, EntrySerializer, SpecialtySerializer
 
@@ -40,7 +41,6 @@ class SchoolEntryList(viewsets.ViewSetMixin, generics.ListAPIView):
 
     def get_queryset(self):
         school_pk = self.kwargs['pk']
-        print("school_pk -> %s", school_pk)
         return Entry.objects.filter(school=school_pk).order_by('specialty')
 
 

@@ -116,7 +116,7 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
         current_user = self.request.user
         user_profile = current_user.profile
         kwargs['instance'] = Entry(owner=current_user, school=user_profile.school)
-        kwargs['user'] current_user
+        kwargs['user'] = current_user
 
         return kwargs
 
