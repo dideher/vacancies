@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'rest_framework',
     'main_app',
     'history',
     'users',
@@ -119,3 +120,12 @@ EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', True)
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '***REMOVED***')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '***REMOVED***')
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
