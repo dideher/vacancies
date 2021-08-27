@@ -113,8 +113,10 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super(EntryCreateView, self).get_form_kwargs()
         # https://stackoverflow.com/questions/32260785/django-validating-unique-together-constraints-in-a-modelform-with-excluded-fiel
-        kwargs['instance'] = Entry(owner=self.request.user)
-        kwargs['user'] = self.request.user
+        current_user = self.request.user
+        user_profile = current_user.profile
+        kwargs['instance'] = Entry(owner=current_user, school=user_profile.school)
+        kwargs['user'] = current_user
 
         return kwargs
 
@@ -124,7 +126,6 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
         #form.instance.owner = self.request.user
         self.request.user.profile.status = False
         self.request.user.profile.save()
-
         return super().form_valid(form)
 
 class EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

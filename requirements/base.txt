@@ -1,7 +1,7 @@
 arabic-reshaper==2.1.1
 asgiref==3.3.1
 dj-database-url==0.5.0
-Django==3.1.4
+Django==3.1.8
 django-crispy-forms==1.10.0
 django-excel-response==2.0.5
 #django-heroku==0.3.1
@@ -12,7 +12,7 @@ gunicorn==20.0.4
 html5lib==1.1
 jdcal==1.4.1
 openpyxl==2.4.11
-Pillow==8.0.1
+Pillow==8.1.1
 #psycopg2==2.8.6
 PyPDF2==1.26.0
 python-bidi==0.4.2
@@ -23,4 +23,6 @@ sqlparse==0.4.1
 webencodings==0.5.1
 whitenoise==5.2.0
 xhtml2pdf==0.2.5
+djangorestframework==3.12.4
+Markdown==3.3.4
 django-impersonate
