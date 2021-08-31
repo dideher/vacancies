@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
@@ -164,8 +165,14 @@ def about(request):
     return render(request, 'main_app/about.html', {'title': 'Σχετικά'})
 
 
+@login_required()
 def home(request):
-    return render(request, 'main_app/home.html', {'title': 'Αρχική'})
+    user: User = request.user
+    if user.is_superuser or user.is_staff:
+        return redirect(reverse('schools:check_status'))
+    else:
+        # this is a school, so go ahead and show the user's entries
+        return redirect(reverse('main_app:user_entries'))
 
 
 def help(request):
