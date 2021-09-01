@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.views.generic import (
     ListView,
     DetailView,
@@ -10,6 +13,13 @@ from django.views.generic import (
 from .models import Specialty, Entry
 from .forms import EntryCreateForm, EntryUpdateForm
 from history.models import HistoryEntry
+
+
+def check_user_is_superuser(user: User) -> bool:
+    """
+    Check if the user is a superuser
+    """
+    return user.is_superuser
 
 
 class SpecialtiesListView(ListView):
@@ -55,9 +65,7 @@ class EntriesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     paginate_by = 10
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return check_user_is_superuser(self.request.user)
 
 
 class EntriesVacanciesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -70,9 +78,7 @@ class EntriesVacanciesListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         return Entry.objects.filter(type='Κενό', hours__gt=0).order_by('specialty', 'owner')
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return check_user_is_superuser(self.request.user)
 
 
 class EntriesSurplusListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -85,9 +91,7 @@ class EntriesSurplusListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return Entry.objects.filter(type='Πλεόνασμα', hours__gt=0).order_by('specialty', 'owner')
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return check_user_is_superuser(self.request.user)
 
 
 class UserEntriesListView(LoginRequiredMixin, ListView):
@@ -128,6 +132,7 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
         self.request.user.profile.save()
         return super().form_valid(form)
 
+
 class EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Entry
     form_class = EntryUpdateForm
@@ -160,18 +165,25 @@ def about(request):
     return render(request, 'main_app/about.html', {'title': 'Σχετικά'})
 
 
+@login_required()
 def home(request):
-    return render(request, 'main_app/home.html', {'title': 'Αρχική'})
+    user: User = request.user
+    if user.is_superuser or user.is_staff:
+        return redirect(reverse('schools:check_status'))
+    else:
+        # this is a school, so go ahead and show the user's entries
+        return redirect(reverse('main_app:user_entries'))
+
 
 def help(request):
     return render(request, 'main_app/help.html', {'title': 'Εγχειρίδιο Χρήσης'})
 
+
+@login_required
+@user_passes_test(check_user_is_superuser)
 def clear_entries(request):
     if request.method == 'POST':
         Entry.objects.all().delete()
         return redirect('main_app:entries')
     else:
-        if request.user.is_superuser:
-            return render(request, 'main_app/clear_entries.html')
-        else:
-            return render(request, 'main_app/error.html')
+        return render(request, 'main_app/clear_entries.html')
