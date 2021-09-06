@@ -52,6 +52,23 @@ class School(models.Model):
         default=SchoolVariant.GENERAL,
         null=False
     )
+    school_group = models.ForeignKey('SchoolGroup',
+                                     verbose_name=_('Σχολική Ομάδα'),
+                                     on_delete=models.SET_NULL,
+                                     null=True,
+                                     related_name='schools')
 
     def __str__(self):
         return f'{self.name}'
+
+
+class SchoolGroup(models.Model):
+    """
+    Models a school group
+    """
+    name = models.CharField(max_length=100, null=False, verbose_name='Ομάδα', unique=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
