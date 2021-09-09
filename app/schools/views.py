@@ -5,13 +5,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic import ListView, DetailView
 from .models import School
 from users.models import Profile
-
-
-def check_user_is_superuser(user: User) -> bool:
-    """
-    Check if the user is a superuser
-    """
-    return user.is_superuser
+from shared import check_user_is_superuser
 
 
 class SchoolDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
