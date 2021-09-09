@@ -1,7 +1,10 @@
+import logging
+import openpyxl
+
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
-import openpyxl
+from django.contrib.auth.decorators import user_passes_test, login_required
 from excel_response import ExcelResponse
 from .forms import UploadFileForm
 from main_app.models import Entry, Specialty, EntryVariantType
@@ -10,7 +13,19 @@ from users.models import Profile
 from django.contrib import messages
 from history.models import HistoryEntry
 
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
+
+def check_user_is_superuser(user: User) -> bool:
+    """
+    Check if the user is a superuser
+    """
+    return user.is_superuser
+
+
+@login_required
+@user_passes_test(check_user_is_superuser)
 @csrf_protect
 def upload_specialties(request):
     if request.method == 'POST':
@@ -37,20 +52,18 @@ def upload_specialties(request):
 
                 for row in excel_data[1:]:
                     Specialty.objects.create(code=row[0], lectic=row[1])
-            except:
+            except Exception as e:
                 messages.warning(request, "Κάτι πήγε λάθος...")
-                print("Something went wrong!")
+                logger.exception("Something went wrong!")
 
         return render(request, 'excels/upload_specialties.html', {'form': form, 'excel_data': excel_data})
     else:
-        if request.user.is_superuser:
-            form = UploadFileForm()
-
-            return render(request, 'excels/upload_specialties.html', {'form': form})
-        else:
-            return render(request, 'main_app/error.html')
+        form = UploadFileForm()
+        return render(request, 'excels/upload_specialties.html', {'form': form})
 
 
+@login_required
+@user_passes_test(check_user_is_superuser)
 @csrf_protect
 def add_specialties(request):
     if request.method == 'POST':
@@ -78,18 +91,16 @@ def add_specialties(request):
             except:
                 messages.warning(request,
                                  "Κάτι πήγε λάθος... Μάλλον οι εγγραφές που μόλις φόρτωσες υπήρχαν ήδη στον πίνακα.")
-                print("Something went wrong!")
+                logger.exception("Something went wrong!")
 
         return render(request, 'excels/add_specialties.html', {'form': form, 'excel_data': excel_data})
     else:
-        if request.user.is_superuser:
-            form = UploadFileForm()
-
-            return render(request, 'excels/add_specialties.html', {'form': form})
-        else:
-            return render(request, 'main_app/error.html')
+        form = UploadFileForm()
+        return render(request, 'excels/add_specialties.html', {'form': form})
 
 
+@login_required
+@user_passes_test(check_user_is_superuser)
 @csrf_protect
 def upload_schools(request):
     if request.method == 'POST':
@@ -122,18 +133,16 @@ def upload_schools(request):
                 reconnect_users_to_schools()
             except:
                 messages.warning(request, "Κάτι πήγε λάθος...")
-                print("Something went wrong!")
+                logger.exception("Something went wrong!")
 
         return render(request, 'excels/upload_schools.html', {'form': form, 'excel_data': excel_data})
     else:
-        if request.user.is_superuser:
-            form = UploadFileForm()
-
-            return render(request, 'excels/upload_schools.html', {'form': form})
-        else:
-            return render(request, 'main_app/error.html')
+        form = UploadFileForm()
+        return render(request, 'excels/upload_schools.html', {'form': form})
 
 
+@login_required
+@user_passes_test(check_user_is_superuser)
 @csrf_protect
 def add_schools(request):
     if request.method == 'POST':
@@ -163,64 +172,62 @@ def add_schools(request):
             except:
                 messages.warning(request,
                                  "Κάτι πήγε λάθος... Μάλλον οι εγγραφές που μόλις φόρτωσες υπήρχαν ήδη στον πίνακα.")
-                print("Something went wrong!")
+                logger.exception("Something went wrong!")
 
         return render(request, 'excels/add_schools.html', {'form': form, 'excel_data': excel_data})
     else:
-        if request.user.is_superuser:
-            form = UploadFileForm()
-
-            return render(request, 'excels/add_schools.html', {'form': form})
-        else:
-            return render(request, 'main_app/error.html')
+        form = UploadFileForm()
+        return render(request, 'excels/add_schools.html', {'form': form})
 
 
+@login_required
+@user_passes_test(check_user_is_superuser)
 def excel_entries(request):
-    if request.user.is_superuser:
-        entries = Entry.objects.all().order_by('specialty')
 
-        data = list()
-        header = [
-            'Σχολείο', 'Ειδικότητα', 'Είδος', 'Τύπος', 'Ώρες',
-            'Παρατηρήσεις', 'Χρονική σήμανση'
+    entries = Entry.objects.all().order_by('specialty')
+
+    data = list()
+    header = [
+        'Σχολείο', 'Ειδικότητα', 'Είδος', 'Τύπος', 'Ώρες',
+        'Παρατηρήσεις', 'Χρονική σήμανση'
+    ]
+    data.append(header)
+    for entry in entries:
+        row = [
+            entry.owner.last_name, entry.specialty.code, entry.type,
+            str(EntryVariantType(entry.variant).label), entry.hours,
+            entry.description, entry.date_time,
         ]
-        data.append(header)
-        for entry in entries:
-            row = [
-                entry.owner.last_name, entry.specialty.code, entry.type,
-                str(EntryVariantType(entry.variant).label), entry.hours,
-                entry.description, entry.date_time,
-            ]
-            data.append(row)
+        data.append(row)
 
-        return ExcelResponse(data, 'entries')
-    else:
-        return render(request, 'main_app/error.html', {})
+    return ExcelResponse(data, 'entries')
 
 
+@login_required
+@user_passes_test(check_user_is_superuser)
 def excel_history(request):
-    if request.user.is_superuser:
-        entries = HistoryEntry.objects.all().order_by('owner', 'specialty')
 
-        data = list()
-        header = [
-            'Σχολείο', 'Ειδικότητα', 'Είδος', 'Τύπος', 'Ώρες',
-            'Παρατηρήσεις', 'Χρονική σήμανση'
+    entries = HistoryEntry.objects.all().order_by('owner', 'specialty')
+
+    data = list()
+    header = [
+        'Σχολείο', 'Ειδικότητα', 'Είδος', 'Τύπος', 'Ώρες',
+        'Παρατηρήσεις', 'Χρονική σήμανση'
+    ]
+    data.append(header)
+    for entry in entries:
+        row = [
+            entry.owner.last_name, entry.specialty.code, entry.type,
+            str(EntryVariantType(entry.variant).label), entry.hours,
+            entry.description, entry.date_time
         ]
-        data.append(header)
-        for entry in entries:
-            row = [
-                entry.owner.last_name, entry.specialty.code, entry.type,
-                str(EntryVariantType(entry.variant).label), entry.hours,
-                entry.description, entry.date_time
-            ]
-            data.append(row)
+        data.append(row)
 
-        return ExcelResponse(data, 'history')
-    else:
-        return render(request, 'main_app/error.html', {})
+    return ExcelResponse(data, 'history')
 
 
+@login_required
+@user_passes_test(check_user_is_superuser)
 def excel_user_history(request):
     entries = HistoryEntry.objects.filter(owner=request.user)
 
