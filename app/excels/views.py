@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import user_passes_test, login_required
 from excel_response import ExcelResponse
 from .forms import UploadFileForm
+from shared import check_user_is_superuser
 from main_app.models import Entry, Specialty, EntryVariantType
 from schools.models import School
 from users.models import Profile
@@ -15,13 +16,6 @@ from history.models import HistoryEntry
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
-
-def check_user_is_superuser(user: User) -> bool:
-    """
-    Check if the user is a superuser
-    """
-    return user.is_superuser
 
 
 @login_required

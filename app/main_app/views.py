@@ -13,13 +13,7 @@ from django.views.generic import (
 from .models import Specialty, Entry
 from .forms import EntryCreateForm, EntryUpdateForm
 from history.models import HistoryEntry
-
-
-def check_user_is_superuser(user: User) -> bool:
-    """
-    Check if the user is a superuser
-    """
-    return user.is_superuser
+from shared import check_user_is_superuser
 
 
 class SpecialtiesListView(ListView):
