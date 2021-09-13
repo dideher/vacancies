@@ -67,6 +67,7 @@ class SchoolGroup(models.Model):
     Models a school group
     """
     name = models.CharField(max_length=100, null=False, verbose_name='Ομάδα', unique=True)
+    ordering = models.PositiveSmallIntegerField(null=True, verbose_name='Σειρά')
 
     def __str__(self):
         return str(self.name)
