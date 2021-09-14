@@ -11,9 +11,8 @@ future==0.18.2
 gunicorn==20.0.4
 html5lib==1.1
 jdcal==1.4.1
-openpyxl==2.4.11
+openpyxl
 Pillow==8.1.1
-#psycopg2==2.8.6
 PyPDF2==1.26.0
 python-bidi==0.4.2
 pytz==2020.4
@@ -26,3 +25,4 @@ xhtml2pdf==0.2.5
 djangorestframework==3.12.4
 Markdown==3.3.4
 django-impersonate
+sortedcontainers
