@@ -1,21 +1,219 @@
 import logging
-import openpyxl
-
+from openpyxl import Workbook, load_workbook
+from openpyxl.writer.excel import save_virtual_workbook
+from sortedcontainers import SortedSet
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.contrib import messages
+from django.db.models import QuerySet
+from django.http import HttpResponse
 from excel_response import ExcelResponse
 from .forms import UploadFileForm
 from shared import check_user_is_superuser
 from main_app.models import Entry, Specialty, EntryVariantType
 from schools.models import School
 from users.models import Profile
-from django.contrib import messages
 from history.models import HistoryEntry
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
+
+
+class AggregatedEntriesReport:
+
+    def __init__(self):
+
+        self.entries: QuerySet[Entry] = Entry.objects.all()
+
+    def createSpecialtiesTypes(self):
+        self.generalEducationSpcTypes = SortedSet()
+        self.specialEducationSpcTypes = SortedSet()
+        self.miscSpcTypes = SortedSet()
+
+        for entry in self.entries:
+            entry_variant = str(EntryVariantType(entry.variant).label)
+            entry_specialization = entry.specialty.code
+            if entry_variant == 'Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα':
+                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                self.generalEducationSpcTypes.add(
+                    f'{entry_specialization} - Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Παιδείας (Σύνολο)')
+            elif entry_variant == 'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα':
+                self.generalEducationSpcTypes.add(
+                    f'{entry_specialization} - Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+            elif 'Ειδικής Αγωγής' in entry_variant:
+                self.specialEducationSpcTypes.add(f'{entry_specialization} - {entry_variant}')
+            else:
+                self.miscSpcTypes.add(f'{entry_specialization} - {entry_variant}')
+
+    def getSchools(self):
+        self.generalEducationSchools = SortedSet()
+        self.specialEducationSchools = SortedSet()
+        self.miscSchools = SortedSet()
+
+        for entry in self.entries:
+            entry_variant = str(EntryVariantType(entry.variant).label)
+            #school_name = entry.owner.last_name (charis version)
+            school_name = entry.school.name
+            if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                 'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
+                self.generalEducationSchools.add(school_name)
+            elif 'Ειδικής Αγωγής' in entry_variant:
+                self.specialEducationSchools.add(school_name)
+            else:
+                self.miscSchools.add(school_name)
+
+    def createTables(self):
+        self.createGEStable()
+        self.createSEStable()
+        self.createMStable()
+
+    def createMStable(self):
+        self.msTable = list()
+        header = list()
+        header.append('Σχολείο')
+        header += self.miscSpcTypes[:]
+
+        self.msTable.append(header)
+        for sch in self.miscSchools:
+            entry = list()
+            entry.append(sch)
+            sch_values = [0] * len(self.miscSpcTypes)
+
+            for vacancy_entry in self.entries:
+                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
+                school_name = vacancy_entry.school.name
+                entry_type = vacancy_entry.type
+                entry_hours = vacancy_entry.hours
+                entry_specialization = vacancy_entry.specialty.code
+
+                if school_name != sch:
+                    continue
+
+                if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'] \
+                        or 'Ειδικής Αγωγής' in entry_variant:
+                    continue
+
+                spcType = f'{entry_specialization} - {entry_variant}'
+                indexScpType = self.miscSpcTypes.index(spcType)
+
+                if entry_type == 'Κενό':
+                    sch_values[indexScpType] -= int(entry_hours)
+                else:
+                    sch_values[indexScpType] += int(entry_hours)
+
+            entry += sch_values
+
+            self.msTable.append(entry)
+
+    def createSEStable(self):
+        self.sesTable = list()
+        header = list()
+        header.append('Σχολείο')
+        header += self.specialEducationSpcTypes[:]
+        print(self.specialEducationSchools)
+        self.sesTable.append(header)
+        for sch in self.specialEducationSchools:
+            entry = list()
+            entry.append(sch)
+            sch_values = [0] * len(self.specialEducationSpcTypes)
+
+            for vacancy_entry in self.entries:
+                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
+                school_name = vacancy_entry.school.name
+                entry_type = vacancy_entry.type
+                entry_hours = vacancy_entry.hours
+                entry_specialization = vacancy_entry.specialty.code
+                if school_name != sch:
+                    continue
+                if 'Ειδικής Αγωγής' in entry_variant:
+                    spcType = f'{entry_specialization} - {entry_variant}'
+                    indexScpType = self.specialEducationSpcTypes.index(spcType)
+                    if entry_type == 'Κενό':
+                        sch_values[indexScpType] -= int(entry_hours)
+                    else:
+                        sch_values[indexScpType] += int(entry_hours)
+                else:
+                    continue
+
+            entry += sch_values
+
+            self.sesTable.append(entry)
+
+    def createGEStable(self):
+        self.gesTable = list()
+        header = list()
+        header.append('Σχολείο')
+        header += self.generalEducationSpcTypes[:]
+
+        self.gesTable.append(header)
+        for sch in self.generalEducationSchools:
+            entry = list()
+            entry.append(sch)
+            sch_values = [0] * len(self.generalEducationSpcTypes)
+
+            for vacancy_entry in self.entries:
+                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
+                school_name = vacancy_entry.school.name
+                entry_type = vacancy_entry.type
+                entry_hours = vacancy_entry.hours
+                entry_specialization = vacancy_entry.specialty.code
+
+                if school_name != sch:
+                    continue
+
+                if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
+                    spcType = f'{entry_specialization} - {entry_variant}'
+                    indexScpType = self.generalEducationSpcTypes.index(spcType)
+
+                    if entry_type == 'Κενό':
+                        sch_values[indexScpType] -= int(entry_hours)
+                    else:
+                        sch_values[indexScpType] += int(entry_hours)
+                else:
+                    continue
+
+                spcType = f'{entry_specialization} - Γενικής Παιδείας (Σύνολο)'
+                if spcType in self.generalEducationSpcTypes:
+                    indexScpType = self.generalEducationSpcTypes.index(spcType)
+                    if entry_type == 'Κενό':
+                        sch_values[indexScpType] -= int(entry_hours)
+                    else:
+                        sch_values[indexScpType] += int(entry_hours)
+
+            entry += sch_values
+
+            self.gesTable.append(entry)
+
+    def get_workbook(self):
+
+        self.getSchools()
+        self.createSpecialtiesTypes()
+        self.createTables()
+
+        workbook = Workbook()
+
+        # Γενικής Παιδείας
+        worksheet = workbook.active
+        worksheet.title = 'Γενικής Παιδείας'
+        for row in self.gesTable:
+            worksheet.append(row)
+
+        # Ειδικής Αγωγής
+        worksheet = workbook.create_sheet(title='Ειδικής Αγωγής')
+        for row in self.sesTable:
+            worksheet.append(row)
+
+        # Υπόλοιπα
+        worksheet = workbook.create_sheet(title='Υπόλοιπα')
+        for row in self.msTable:
+            worksheet.append(row)
+
+        return workbook
 
 
 @login_required
@@ -28,7 +226,7 @@ def upload_specialties(request):
             try:
                 excel_file = request.FILES["file"]
 
-                workbook = openpyxl.load_workbook(excel_file)
+                workbook = load_workbook(excel_file)
                 worksheet = workbook.active
                 excel_data = list()
                 for row in worksheet.iter_rows():
@@ -66,7 +264,7 @@ def add_specialties(request):
             try:
                 excel_file = request.FILES["file"]
 
-                workbook = openpyxl.load_workbook(excel_file)
+                workbook = load_workbook(excel_file)
                 worksheet = workbook.active
                 excel_data = list()
                 for row in worksheet.iter_rows():
@@ -103,7 +301,7 @@ def upload_schools(request):
             try:
                 excel_file = request.FILES["file"]
 
-                workbook = openpyxl.load_workbook(excel_file)
+                workbook = load_workbook(excel_file)
                 worksheet = workbook.active
                 excel_data = list()
                 for row in worksheet.iter_rows():
@@ -145,7 +343,7 @@ def add_schools(request):
             try:
                 excel_file = request.FILES["file"]
 
-                workbook = openpyxl.load_workbook(excel_file)
+                workbook = load_workbook(excel_file)
                 worksheet = workbook.active
                 excel_data = list()
                 for row in worksheet.iter_rows():
@@ -279,3 +477,16 @@ def reconnect_nv_users_to_schools():
             profile.save()
         except School.DoesNotExist:
             pass
+
+
+@login_required
+@user_passes_test(check_user_is_superuser)
+def excel_aggregated_entries(request):
+
+    report = AggregatedEntriesReport()
+    workbook = report.get_workbook()
+
+    response = HttpResponse(content=save_virtual_workbook(workbook),
+                            content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=kena_aggregated.xlsx'
+    return response

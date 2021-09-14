@@ -113,6 +113,12 @@
                             <a class="sidebar-item" href="{% url 'main_app:entries_surplus' %}">Προβολή Πλεονασμάτων</a>
                         </li>
                         <li class="list-group-item list-group-item-light sidebar">
+                            <span class="sidebar-item">
+                                <a class="sidebar-item" href="{% url 'excels:excel_aggregated_entries' %}">Εξαγωγή
+                                    καταχωρίσεων συγκεντρωτικά σε Excel</a>
+                            </span>
+                        </li>
+                        <li class="list-group-item list-group-item-light sidebar">
                             <span class="sidebar-item">Εξαγωγή καταχωρίσεων σε
                                 [ <a class="sidebar-item" href="{% url 'excels:excel_entries' %}">xlsx</a> |
                                 <a class="sidebar-item" href="{% url 'pdfs:pdf_entries' %}">pdf</a> ]
