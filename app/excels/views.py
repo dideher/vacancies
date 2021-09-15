@@ -25,7 +25,7 @@ class AggregatedEntriesReport:
 
     def __init__(self):
 
-        self.entries: QuerySet[Entry] = Entry.objects.all()
+        self.entries: QuerySet[Entry] = Entry.objects.all().order_by("school__school_group__ordering", "school__id")
 
     def createSpecialtiesTypes(self):
         self.generalEducationSpcTypes = SortedSet()
@@ -49,9 +49,9 @@ class AggregatedEntriesReport:
                 self.miscSpcTypes.add(f'{entry_specialization} - {entry_variant}')
 
     def getSchools(self):
-        self.generalEducationSchools = SortedSet()
-        self.specialEducationSchools = SortedSet()
-        self.miscSchools = SortedSet()
+        self.generalEducationSchools = list()
+        self.specialEducationSchools = list()
+        self.miscSchools = list()
 
         for entry in self.entries:
             entry_variant = str(EntryVariantType(entry.variant).label)
@@ -59,11 +59,14 @@ class AggregatedEntriesReport:
             school_name = entry.school.name
             if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
                                  'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
-                self.generalEducationSchools.add(school_name)
+                if school_name not in self.generalEducationSchools:
+                    self.generalEducationSchools.append(school_name)
             elif 'Ειδικής Αγωγής' in entry_variant:
-                self.specialEducationSchools.add(school_name)
+                if school_name not in self.specialEducationSchools:
+                    self.specialEducationSchools.append(school_name)
             else:
-                self.miscSchools.add(school_name)
+                if school_name not in self.miscSchools:
+                    self.miscSchools.append(school_name)
 
     def createTables(self):
         self.createGEStable()
