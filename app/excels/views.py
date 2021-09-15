@@ -203,18 +203,21 @@ class AggregatedEntriesReport:
         # Γενικής Παιδείας
         worksheet = workbook.active
         worksheet.title = 'Γενικής Παιδείας'
-        for row in self.gesTable:
-            worksheet.append(row)
+        if len(self.gesTable) > 1:
+            for row in self.gesTable:
+                worksheet.append(row)
 
         # Ειδικής Αγωγής
         worksheet = workbook.create_sheet(title='Ειδικής Αγωγής')
-        for row in self.sesTable:
-            worksheet.append(row)
+        if len(self.sesTable) > 1:
+            for row in self.sesTable:
+                worksheet.append(row)
 
         # Υπόλοιπα
         worksheet = workbook.create_sheet(title='Υπόλοιπα')
-        for row in self.msTable:
-            worksheet.append(row)
+        if len(self.msTable) > 1:
+            for row in self.msTable:
+                worksheet.append(row)
 
         return workbook
 
