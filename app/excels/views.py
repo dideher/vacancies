@@ -84,6 +84,7 @@ class AggregatedEntriesReport:
             entry = list()
             entry.append(sch)
             sch_values = [0] * len(self.miscSpcTypes)
+            school_entries_descriptions = list()
 
             for vacancy_entry in self.entries:
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
@@ -91,6 +92,7 @@ class AggregatedEntriesReport:
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
                 entry_specialization = vacancy_entry.specialty.code
+                entry_description: str = vacancy_entry.description
 
                 if school_name != sch:
                     continue
@@ -102,6 +104,8 @@ class AggregatedEntriesReport:
 
                 spcType = f'{entry_specialization} - {entry_variant}'
                 indexScpType = self.miscSpcTypes.index(spcType)
+                if entry_description is not None and len(entry_description.strip()) > 0:
+                    school_entries_descriptions.append(f'{entry_specialization} - {entry_description}')
 
                 if entry_type == 'Κενό':
                     sch_values[indexScpType] -= int(entry_hours)
@@ -109,6 +113,7 @@ class AggregatedEntriesReport:
                     sch_values[indexScpType] += int(entry_hours)
 
             entry += sch_values
+            entry.append("\n".join(school_entries_descriptions))
 
             self.msTable.append(entry)
 
@@ -117,12 +122,13 @@ class AggregatedEntriesReport:
         header = list()
         header.append('Σχολείο')
         header += self.specialEducationSpcTypes[:]
-        print(self.specialEducationSchools)
         self.sesTable.append(header)
         for sch in self.specialEducationSchools:
+
             entry = list()
             entry.append(sch)
             sch_values = [0] * len(self.specialEducationSpcTypes)
+            school_entries_descriptions = list()
 
             for vacancy_entry in self.entries:
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
@@ -130,11 +136,17 @@ class AggregatedEntriesReport:
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
                 entry_specialization = vacancy_entry.specialty.code
+                entry_description: str = vacancy_entry.description
+
                 if school_name != sch:
                     continue
+
                 if 'Ειδικής Αγωγής' in entry_variant:
                     spcType = f'{entry_specialization} - {entry_variant}'
                     indexScpType = self.specialEducationSpcTypes.index(spcType)
+                    if entry_description is not None and len(entry_description.strip()) > 0:
+                        school_entries_descriptions.append(f'{entry_specialization} - {entry_description}')
+
                     if entry_type == 'Κενό':
                         sch_values[indexScpType] -= int(entry_hours)
                     else:
@@ -143,6 +155,7 @@ class AggregatedEntriesReport:
                     continue
 
             entry += sch_values
+            entry.append("\n".join(school_entries_descriptions))
 
             self.sesTable.append(entry)
 
@@ -154,9 +167,11 @@ class AggregatedEntriesReport:
 
         self.gesTable.append(header)
         for sch in self.generalEducationSchools:
+
             entry = list()
             entry.append(sch)
             sch_values = [0] * len(self.generalEducationSpcTypes)
+            school_entries_descriptions = list()
 
             for vacancy_entry in self.entries:
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
@@ -164,6 +179,7 @@ class AggregatedEntriesReport:
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
                 entry_specialization = vacancy_entry.specialty.code
+                entry_description: str = vacancy_entry.description
 
                 if school_name != sch:
                     continue
@@ -172,6 +188,8 @@ class AggregatedEntriesReport:
                                      'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
                     spcType = f'{entry_specialization} - {entry_variant}'
                     indexScpType = self.generalEducationSpcTypes.index(spcType)
+                    if entry_description is not None and len(entry_description.strip()) > 0:
+                        school_entries_descriptions.append(f'{entry_specialization} - {entry_description}')
 
                     if entry_type == 'Κενό':
                         sch_values[indexScpType] -= int(entry_hours)
@@ -189,6 +207,7 @@ class AggregatedEntriesReport:
                         sch_values[indexScpType] += int(entry_hours)
 
             entry += sch_values
+            entry.append("\n".join(school_entries_descriptions))
 
             self.gesTable.append(entry)
 
