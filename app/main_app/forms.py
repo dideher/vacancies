@@ -115,6 +115,7 @@ class EntryCreateForm(forms.ModelForm):
     )
 
     specialty = SpecialtyModelChoiceField(
+        label=_('Ειδικότητα'),
         queryset=Specialty.objects.all()
     )
 
@@ -142,6 +143,11 @@ class EntryCreateForm(forms.ModelForm):
 
 
 class EntryUpdateForm(forms.ModelForm):
+
+    # variant = forms.ChoiceField(
+    #     label=_('Τύπος Κενού / Πλεονάσματος'),
+    #     help_text=_('Επιλέξετε το είδος του κενού'),
+    # )
 
     class Meta:
         model = Entry
