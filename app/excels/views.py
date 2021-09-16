@@ -38,7 +38,7 @@ class AggregatedEntriesReport:
 
         for entry in self.entries:
             entry_variant = str(EntryVariantType(entry.variant).label)
-            entry_specialization = entry.specialty.code
+            entry_specialization = f'{entry.specialty.code} {entry.specialty.lectic}'
             if entry_variant == 'Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα':
                 self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
                 self.generalEducationSpcTypes.add(
@@ -96,7 +96,7 @@ class AggregatedEntriesReport:
                 school_name = vacancy_entry.school.name
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
-                entry_specialization = vacancy_entry.specialty.code
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
                 if school_name != sch:
@@ -142,7 +142,7 @@ class AggregatedEntriesReport:
                 school_name = vacancy_entry.school.name
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
-                entry_specialization = vacancy_entry.specialty.code
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
                 if school_name != sch:
@@ -186,7 +186,7 @@ class AggregatedEntriesReport:
                 school_name = vacancy_entry.school.name
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
-                entry_specialization = vacancy_entry.specialty.code
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
                 if school_name != sch:
