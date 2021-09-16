@@ -1,6 +1,10 @@
 import logging
 from openpyxl import Workbook, load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
+from openpyxl.styles import NamedStyle, Font, Border, Side, Alignment
+from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder, RowDimension
+from openpyxl.worksheet import Worksheet
+from openpyxl.utils import get_column_letter
 from sortedcontainers import SortedSet
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -78,6 +82,7 @@ class AggregatedEntriesReport:
         header = list()
         header.append('Σχολείο')
         header += self.miscSpcTypes[:]
+        header.append("Παρατηρήσεις")
 
         self.msTable.append(header)
         for sch in self.miscSchools:
@@ -122,6 +127,8 @@ class AggregatedEntriesReport:
         header = list()
         header.append('Σχολείο')
         header += self.specialEducationSpcTypes[:]
+        header.append("Παρατηρήσεις")
+
         self.sesTable.append(header)
         for sch in self.specialEducationSchools:
 
@@ -164,6 +171,7 @@ class AggregatedEntriesReport:
         header = list()
         header.append('Σχολείο')
         header += self.generalEducationSpcTypes[:]
+        header.append("Παρατηρήσεις")
 
         self.gesTable.append(header)
         for sch in self.generalEducationSchools:
@@ -213,30 +221,64 @@ class AggregatedEntriesReport:
 
     def get_workbook(self):
 
+        def style_ws(ws):
+
+            # style header
+            for col in range(ws.min_column, ws.max_column + 1):
+                ws[get_column_letter(col) + '1'].style = 'header_style'
+
+            # update column dimensions
+            dim_holder = DimensionHolder(worksheet=ws)
+            for col in range(ws.min_column, ws.max_column + 1):
+                dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, auto_size=True)
+
+            ws.column_dimensions = dim_holder
+            # update 1st row height
+            ws.row_dimensions[1] = RowDimension(ws, height=180)
+
         self.getSchools()
         self.createSpecialtiesTypes()
         self.createTables()
 
         workbook = Workbook()
 
+        header_style = NamedStyle(name="header_style")
+        header_style.font = Font(bold=True, size=10)
+        bd = Side(style='thick', color="000000")
+        header_style.border = Border(bottom=bd)
+        header_style.alignment = Alignment(textRotation=90, wrapText=True, horizontal="center", vertical="center")
+        workbook.add_named_style(header_style)
+
         # Γενικής Παιδείας
-        worksheet = workbook.active
-        worksheet.title = 'Γενικής Παιδείας'
+
+        ws = workbook.active
+        ws.title = 'Γενικής Παιδείας'
+        ws.set_printer_settings(paper_size=Worksheet.PAPERSIZE_A4, orientation=Worksheet.ORIENTATION_PORTRAIT)
+
         if len(self.gesTable) > 1:
+
             for row in self.gesTable:
-                worksheet.append(row)
+                ws.append(row)
+
+            style_ws(ws)
 
         # Ειδικής Αγωγής
-        worksheet = workbook.create_sheet(title='Ειδικής Αγωγής')
+        ws = workbook.create_sheet(title='Ειδικής Αγωγής')
         if len(self.sesTable) > 1:
+
             for row in self.sesTable:
-                worksheet.append(row)
+                ws.append(row)
+
+            style_ws(ws)
 
         # Υπόλοιπα
-        worksheet = workbook.create_sheet(title='Υπόλοιπα')
+        ws = workbook.create_sheet(title='Υπόλοιπα')
         if len(self.msTable) > 1:
+
             for row in self.msTable:
-                worksheet.append(row)
+                ws.append(row)
+
+            style_ws(ws)
 
         return workbook
 
