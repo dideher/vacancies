@@ -39,14 +39,14 @@ class AggregatedEntriesReport:
         for entry in self.entries:
             entry_variant = str(EntryVariantType(entry.variant).label)
             entry_specialization = entry.specialty.code
-            if entry_variant == 'Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα':
-                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+            if entry_variant == 'Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα':
+                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
                 self.generalEducationSpcTypes.add(
-                    f'{entry_specialization} - Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
-                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Παιδείας (Σύνολο)')
-            elif entry_variant == 'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα':
+                    f'{entry_specialization} - Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Αγωγής (Σύνολο)')
+            elif entry_variant == 'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα':
                 self.generalEducationSpcTypes.add(
-                    f'{entry_specialization} - Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                    f'{entry_specialization} - Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
             elif 'Ειδικής Αγωγής' in entry_variant:
                 self.specialEducationSpcTypes.add(f'{entry_specialization} - {entry_variant}')
             else:
@@ -61,8 +61,8 @@ class AggregatedEntriesReport:
             entry_variant = str(EntryVariantType(entry.variant).label)
             #school_name = entry.owner.last_name (charis version)
             school_name = entry.school.name
-            if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
-                                 'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
+            if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                 'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
                 if school_name not in self.generalEducationSchools:
                     self.generalEducationSchools.append(school_name)
             elif 'Ειδικής Αγωγής' in entry_variant:
@@ -102,8 +102,8 @@ class AggregatedEntriesReport:
                 if school_name != sch:
                     continue
 
-                if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
-                                     'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'] \
+                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'] \
                         or 'Ειδικής Αγωγής' in entry_variant:
                     continue
 
@@ -192,8 +192,8 @@ class AggregatedEntriesReport:
                 if school_name != sch:
                     continue
 
-                if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
-                                     'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
+                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
                     spcType = f'{entry_specialization} - {entry_variant}'
                     indexScpType = self.generalEducationSpcTypes.index(spcType)
                     if entry_description is not None and len(entry_description.strip()) > 0:
@@ -206,7 +206,7 @@ class AggregatedEntriesReport:
                 else:
                     continue
 
-                spcType = f'{entry_specialization} - Γενικής Παιδείας (Σύνολο)'
+                spcType = f'{entry_specialization} - Γενικής Αγωγής (Σύνολο)'
                 if spcType in self.generalEducationSpcTypes:
                     indexScpType = self.generalEducationSpcTypes.index(spcType)
                     if entry_type == 'Κενό':
@@ -249,10 +249,10 @@ class AggregatedEntriesReport:
         header_style.alignment = Alignment(textRotation=90, wrapText=True, horizontal="center", vertical="center")
         workbook.add_named_style(header_style)
 
-        # Γενικής Παιδείας
+        # Γενικής Αγωγής
 
         ws = workbook.active
-        ws.title = 'Γενικής Παιδείας'
+        ws.title = 'Γενικής Αγωγής'
         ws.set_printer_settings(paper_size=Worksheet.PAPERSIZE_A4, orientation=Worksheet.ORIENTATION_PORTRAIT)
 
         if len(self.gesTable) > 1:

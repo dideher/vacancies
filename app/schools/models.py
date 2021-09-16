@@ -15,7 +15,7 @@ class SchoolTimetable(models.TextChoices):
 
 
 class SchoolVariant(models.TextChoices):
-    GENERAL = 'GENERAL', _('Γενικής Παιδείας')
+    GENERAL = 'GENERAL', _('Γενικής Αγωγής')
     MUSIC = 'MUSIC', _('Μουσικό')
     ART = 'ART', _('Καλλιτεχνικό')
     PEIRAMATIKO = 'PEIRAMATIKO', _('Πειραματικό')
