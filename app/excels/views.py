@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from openpyxl import Workbook, load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.styles import NamedStyle, Font, Border, Side, Alignment
@@ -81,6 +82,7 @@ class AggregatedEntriesReport:
     def createMStable(self):
         self.msTable = list()
         header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
         header.append('Σχολείο')
         header += self.miscSpcTypes[:]
         header.append("Παρατηρήσεις")
@@ -88,6 +90,12 @@ class AggregatedEntriesReport:
         self.msTable.append(header)
         for school in self.miscSchools:
             entry = list()
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
             entry.append(f'{school.school_group.name}, {school.name}')
             sch_values = [0] * len(self.miscSpcTypes)
             school_entries_descriptions = list()
@@ -126,6 +134,7 @@ class AggregatedEntriesReport:
     def createSEStable(self):
         self.sesTable = list()
         header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
         header.append('Σχολείο')
         header += self.specialEducationSpcTypes[:]
         header.append("Παρατηρήσεις")
@@ -134,6 +143,12 @@ class AggregatedEntriesReport:
         for school in self.specialEducationSchools:
 
             entry = list()
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
             entry.append(f'{school.school_group.name}, {school.name}')
             sch_values = [0] * len(self.specialEducationSpcTypes)
             school_entries_descriptions = list()
@@ -170,6 +185,7 @@ class AggregatedEntriesReport:
     def createGEStable(self):
         self.gesTable = list()
         header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
         header.append('Σχολείο')
         header += self.generalEducationSpcTypes[:]
         header.append("Παρατηρήσεις")
@@ -178,6 +194,12 @@ class AggregatedEntriesReport:
         for school in self.generalEducationSchools:
 
             entry = list()
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
             entry.append(f'{school.school_group.name}, {school.name}')
             sch_values = [0] * len(self.generalEducationSpcTypes)
             school_entries_descriptions = list()
@@ -244,6 +266,8 @@ class AggregatedEntriesReport:
             dim_holder = DimensionHolder(worksheet=ws)
             for col in range(ws.min_column, ws.max_column + 1):
                 if col == 1:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=22)
+                elif col == 2:
                     dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=35)
                 else:
                     dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=7)
