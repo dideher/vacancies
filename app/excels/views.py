@@ -58,19 +58,20 @@ class AggregatedEntriesReport:
         self.miscSchools = list()
 
         for entry in self.entries:
+
             entry_variant = str(EntryVariantType(entry.variant).label)
-            #school_name = entry.owner.last_name (charis version)
-            school_name = entry.school.name
+            school = entry.school
+
             if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
                                  'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
-                if school_name not in self.generalEducationSchools:
-                    self.generalEducationSchools.append(school_name)
+                if school not in self.generalEducationSchools:
+                    self.generalEducationSchools.append(school)
             elif 'Ειδικής Αγωγής' in entry_variant:
-                if school_name not in self.specialEducationSchools:
-                    self.specialEducationSchools.append(school_name)
+                if school not in self.specialEducationSchools:
+                    self.specialEducationSchools.append(school)
             else:
-                if school_name not in self.miscSchools:
-                    self.miscSchools.append(school_name)
+                if school not in self.miscSchools:
+                    self.miscSchools.append(school)
 
     def createTables(self):
         self.createGEStable()
@@ -85,9 +86,9 @@ class AggregatedEntriesReport:
         header.append("Παρατηρήσεις")
 
         self.msTable.append(header)
-        for sch in self.miscSchools:
+        for school in self.miscSchools:
             entry = list()
-            entry.append(sch)
+            entry.append(f'{school.school_group.name}, {school.name}')
             sch_values = [0] * len(self.miscSpcTypes)
             school_entries_descriptions = list()
 
@@ -99,7 +100,7 @@ class AggregatedEntriesReport:
                 entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
-                if school_name != sch:
+                if school_name != school.name:
                     continue
 
                 if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
@@ -130,10 +131,10 @@ class AggregatedEntriesReport:
         header.append("Παρατηρήσεις")
 
         self.sesTable.append(header)
-        for sch in self.specialEducationSchools:
+        for school in self.specialEducationSchools:
 
             entry = list()
-            entry.append(sch)
+            entry.append(f'{school.school_group.name}, {school.name}')
             sch_values = [0] * len(self.specialEducationSpcTypes)
             school_entries_descriptions = list()
 
@@ -145,7 +146,7 @@ class AggregatedEntriesReport:
                 entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
-                if school_name != sch:
+                if school_name != school.name:
                     continue
 
                 if 'Ειδικής Αγωγής' in entry_variant:
@@ -174,10 +175,10 @@ class AggregatedEntriesReport:
         header.append("Παρατηρήσεις")
 
         self.gesTable.append(header)
-        for sch in self.generalEducationSchools:
+        for school in self.generalEducationSchools:
 
             entry = list()
-            entry.append(sch)
+            entry.append(f'{school.school_group.name}, {school.name}')
             sch_values = [0] * len(self.generalEducationSpcTypes)
             school_entries_descriptions = list()
 
@@ -189,7 +190,7 @@ class AggregatedEntriesReport:
                 entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
-                if school_name != sch:
+                if school_name != school.name:
                     continue
 
                 if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
