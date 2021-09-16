@@ -243,11 +243,14 @@ class AggregatedEntriesReport:
             # update column dimensions
             dim_holder = DimensionHolder(worksheet=ws)
             for col in range(ws.min_column, ws.max_column + 1):
-                dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, auto_size=True)
+                if col == 1:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=35)
+                else:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=7)
 
             ws.column_dimensions = dim_holder
             # update 1st row height
-            ws.row_dimensions[1] = RowDimension(ws, height=180)
+            ws.row_dimensions[1] = RowDimension(ws, height=150)
 
         self.getSchools()
         self.createSpecialtiesTypes()
@@ -256,7 +259,7 @@ class AggregatedEntriesReport:
         workbook = Workbook()
 
         header_style = NamedStyle(name="header_style")
-        header_style.font = Font(bold=True, size=10)
+        header_style.font = Font(bold=True, size=9)
         bd = Side(style='thick', color="000000")
         header_style.border = Border(bottom=bd)
         header_style.alignment = Alignment(textRotation=90, wrapText=True, horizontal="center", vertical="center")
