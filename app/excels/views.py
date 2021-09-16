@@ -221,6 +221,18 @@ class AggregatedEntriesReport:
 
     def get_workbook(self):
 
+        def filter_headers(header_row):
+            # need to map / manipulate header values
+            for idx, column in enumerate(header_row):
+                if column.endswith('Γενικής Αγωγής (Σύνολο)'):
+                    header_row[idx] = header_row[idx].replace('Γενικής Αγωγής (Σύνολο)', 'Γ.Α. (Σύνολο)')
+                elif column.endswith('Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα'):
+                    header_row[idx] = header_row[idx].replace(
+                        'Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα', 'Γ.Α. - Π.ΕΞ.')
+                elif column.endswith('Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'):
+                    header_row[idx] = header_row[idx].replace(
+                        'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα', 'Γ.Α.')
+
         def style_ws(ws):
 
             # style header
@@ -257,6 +269,8 @@ class AggregatedEntriesReport:
 
         if len(self.gesTable) > 1:
 
+            filter_headers(self.gesTable[0])
+
             for row in self.gesTable:
                 ws.append(row)
 
@@ -266,6 +280,8 @@ class AggregatedEntriesReport:
         ws = workbook.create_sheet(title='Ειδικής Αγωγής')
         if len(self.sesTable) > 1:
 
+            filter_headers(self.sesTable[0])
+
             for row in self.sesTable:
                 ws.append(row)
 
@@ -274,6 +290,8 @@ class AggregatedEntriesReport:
         # Υπόλοιπα
         ws = workbook.create_sheet(title='Υπόλοιπα')
         if len(self.msTable) > 1:
+
+            filter_headers(self.msTable[0])
 
             for row in self.msTable:
                 ws.append(row)
