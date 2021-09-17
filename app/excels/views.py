@@ -206,13 +206,20 @@ class AggregatedEntriesReport:
                     continue
 
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
-                entry_type = vacancy_entry.type
-                entry_hours = vacancy_entry.hours
-                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
-                entry_description: str = vacancy_entry.description
 
-                if entry_description is not None and len(entry_description.strip()) > 0:
-                    school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - {entry_description}')
+                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
+
+                    entry_type = vacancy_entry.type
+                    entry_hours = vacancy_entry.hours
+                    entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                    entry_description: str = vacancy_entry.description
+
+                    if entry_description is not None and len(entry_description.strip()) > 0:
+                        school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - '
+                                                           f'{entry_description}')
+                else:
+                    continue
 
             entry.append("\n".join(school_entries_descriptions))
 
@@ -252,13 +259,18 @@ class AggregatedEntriesReport:
                     continue
 
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
-                entry_type = vacancy_entry.type
-                entry_hours = vacancy_entry.hours
-                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
-                entry_description: str = vacancy_entry.description
 
-                if entry_description is not None and len(entry_description.strip()) > 0:
-                    school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - {entry_description}')
+                if 'Ειδικής Αγωγής' in entry_variant:
+                    entry_type = vacancy_entry.type
+                    entry_hours = vacancy_entry.hours
+                    entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                    entry_description: str = vacancy_entry.description
+
+                    if entry_description is not None and len(entry_description.strip()) > 0:
+                        school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - '
+                                                           f'{entry_description}')
+                else:
+                    continue
 
             entry.append("\n".join(school_entries_descriptions))
 
@@ -299,14 +311,18 @@ class AggregatedEntriesReport:
 
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
 
-                if 'Ειδικής Αγωγής' in entry_variant:
-                    entry_type = vacancy_entry.type
-                    entry_hours = vacancy_entry.hours
-                    entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
-                    entry_description: str = vacancy_entry.description
+                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'] \
+                        or 'Ειδικής Αγωγής' in entry_variant:
+                    continue
 
-                    if entry_description is not None and len(entry_description.strip()) > 0:
-                        school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - {entry_description}')
+                entry_type = vacancy_entry.type
+                entry_hours = vacancy_entry.hours
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                entry_description: str = vacancy_entry.description
+
+                if entry_description is not None and len(entry_description.strip()) > 0:
+                    school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - {entry_description}')
 
             entry.append("\n".join(school_entries_descriptions))
 
