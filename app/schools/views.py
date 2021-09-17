@@ -1,4 +1,7 @@
+import datetime
+
 from django.contrib.auth.models import User
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import user_passes_test, login_required
@@ -45,6 +48,7 @@ def check_schools(request):
 def status_update(request):
     if request.method == 'POST':
         request.user.profile.status = True
+        request.user.profile.status_time = timezone.now()
         request.user.profile.save()
 
         return redirect('users:info')
@@ -75,7 +79,7 @@ def check_status(request):
 @user_passes_test(check_user_is_superuser)
 def clear_status(request):
     if request.method == 'POST':
-        Profile.objects.all().update(status=False)
+        Profile.objects.all().update(status=False, status_time=None)
         return redirect('schools:check_status')
     else:
         return render(request, 'schools/clear_status.html')

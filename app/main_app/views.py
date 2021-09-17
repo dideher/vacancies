@@ -34,6 +34,7 @@ class EntryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def delete(self, *args, **kwargs):
         original_data = self.get_object()
         self.request.user.profile.status = False
+        self.request.user.profile.status_time = None
         self.request.user.profile.save()
         HistoryEntry.objects.create(specialty=original_data.specialty, owner=original_data.owner,
                                     hours=original_data.hours, date_time=original_data.date_time,
@@ -123,6 +124,7 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
         # form has already been validated by then.
         #form.instance.owner = self.request.user
         self.request.user.profile.status = False
+        self.request.user.profile.status_time = None
         self.request.user.profile.save()
         return super().form_valid(form)
 
@@ -138,6 +140,7 @@ class EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         original_data = self.get_object()
         self.request.user.profile.status = False
+        self.request.user.profile.status_time = None
         self.request.user.profile.save()
         HistoryEntry.objects.create(specialty=original_data.specialty, owner=original_data.owner,
                                     hours=original_data.hours, date_time=original_data.date_time,

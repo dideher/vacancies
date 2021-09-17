@@ -1,8 +1,10 @@
 import logging
+from datetime import datetime
 from openpyxl import Workbook, load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.styles import NamedStyle, Font, Border, Side, Alignment
 from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder, RowDimension
+from openpyxl.cell.cell import Cell
 from openpyxl.worksheet import Worksheet
 from openpyxl.utils import get_column_letter
 from sortedcontainers import SortedSet
@@ -38,15 +40,15 @@ class AggregatedEntriesReport:
 
         for entry in self.entries:
             entry_variant = str(EntryVariantType(entry.variant).label)
-            entry_specialization = entry.specialty.code
-            if entry_variant == 'Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα':
-                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+            entry_specialization = f'{entry.specialty.code} {entry.specialty.lectic}'
+            if entry_variant == 'Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα':
+                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
                 self.generalEducationSpcTypes.add(
-                    f'{entry_specialization} - Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
-                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Παιδείας (Σύνολο)')
-            elif entry_variant == 'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα':
+                    f'{entry_specialization} - Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Αγωγής (Σύνολο)')
+            elif entry_variant == 'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα':
                 self.generalEducationSpcTypes.add(
-                    f'{entry_specialization} - Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                    f'{entry_specialization} - Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
             elif 'Ειδικής Αγωγής' in entry_variant:
                 self.specialEducationSpcTypes.add(f'{entry_specialization} - {entry_variant}')
             else:
@@ -58,19 +60,20 @@ class AggregatedEntriesReport:
         self.miscSchools = list()
 
         for entry in self.entries:
+
             entry_variant = str(EntryVariantType(entry.variant).label)
-            #school_name = entry.owner.last_name (charis version)
-            school_name = entry.school.name
-            if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
-                                 'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
-                if school_name not in self.generalEducationSchools:
-                    self.generalEducationSchools.append(school_name)
+            school = entry.school
+
+            if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                 'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
+                if school not in self.generalEducationSchools:
+                    self.generalEducationSchools.append(school)
             elif 'Ειδικής Αγωγής' in entry_variant:
-                if school_name not in self.specialEducationSchools:
-                    self.specialEducationSchools.append(school_name)
+                if school not in self.specialEducationSchools:
+                    self.specialEducationSchools.append(school)
             else:
-                if school_name not in self.miscSchools:
-                    self.miscSchools.append(school_name)
+                if school not in self.miscSchools:
+                    self.miscSchools.append(school)
 
     def createTables(self):
         self.createGEStable()
@@ -80,37 +83,41 @@ class AggregatedEntriesReport:
     def createMStable(self):
         self.msTable = list()
         header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
         header.append('Σχολείο')
         header += self.miscSpcTypes[:]
-        header.append("Παρατηρήσεις")
 
         self.msTable.append(header)
-        for sch in self.miscSchools:
+        for school in self.miscSchools:
             entry = list()
-            entry.append(sch)
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                # TODO: Need to address timezone here
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
+            entry.append(f'{school.school_group.name}, {school.name}')
             sch_values = [0] * len(self.miscSpcTypes)
-            school_entries_descriptions = list()
 
             for vacancy_entry in self.entries:
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
                 school_name = vacancy_entry.school.name
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
-                entry_specialization = vacancy_entry.specialty.code
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
-                if school_name != sch:
+                if school_name != school.name:
                     continue
 
-                if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
-                                     'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'] \
+                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'] \
                         or 'Ειδικής Αγωγής' in entry_variant:
                     continue
 
                 spcType = f'{entry_specialization} - {entry_variant}'
                 indexScpType = self.miscSpcTypes.index(spcType)
-                if entry_description is not None and len(entry_description.strip()) > 0:
-                    school_entries_descriptions.append(f'{entry_specialization} - {entry_description}')
 
                 if entry_type == 'Κενό':
                     sch_values[indexScpType] -= int(entry_hours)
@@ -118,41 +125,43 @@ class AggregatedEntriesReport:
                     sch_values[indexScpType] += int(entry_hours)
 
             entry += sch_values
-            entry.append("\n".join(school_entries_descriptions))
 
             self.msTable.append(entry)
 
     def createSEStable(self):
         self.sesTable = list()
         header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
         header.append('Σχολείο')
         header += self.specialEducationSpcTypes[:]
-        header.append("Παρατηρήσεις")
 
         self.sesTable.append(header)
-        for sch in self.specialEducationSchools:
+        for school in self.specialEducationSchools:
 
             entry = list()
-            entry.append(sch)
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
+            entry.append(f'{school.school_group.name}, {school.name}')
             sch_values = [0] * len(self.specialEducationSpcTypes)
-            school_entries_descriptions = list()
 
             for vacancy_entry in self.entries:
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
                 school_name = vacancy_entry.school.name
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
-                entry_specialization = vacancy_entry.specialty.code
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
-                if school_name != sch:
+                if school_name != school.name:
                     continue
 
                 if 'Ειδικής Αγωγής' in entry_variant:
                     spcType = f'{entry_specialization} - {entry_variant}'
                     indexScpType = self.specialEducationSpcTypes.index(spcType)
-                    if entry_description is not None and len(entry_description.strip()) > 0:
-                        school_entries_descriptions.append(f'{entry_specialization} - {entry_description}')
 
                     if entry_type == 'Κενό':
                         sch_values[indexScpType] -= int(entry_hours)
@@ -162,42 +171,202 @@ class AggregatedEntriesReport:
                     continue
 
             entry += sch_values
-            entry.append("\n".join(school_entries_descriptions))
 
             self.sesTable.append(entry)
 
-    def createGEStable(self):
-        self.gesTable = list()
-        header = list()
-        header.append('Σχολείο')
-        header += self.generalEducationSpcTypes[:]
-        header.append("Παρατηρήσεις")
+    def construct_ges_description_table(self):
 
-        self.gesTable.append(header)
-        for sch in self.generalEducationSchools:
+        ges_description_table = list()
+
+        header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
+        header.append('Σχολείο')
+        header.append('Παρατηρήσεις')
+
+        ges_description_table.append(header)
+
+        for school in self.generalEducationSchools:
 
             entry = list()
-            entry.append(sch)
-            sch_values = [0] * len(self.generalEducationSpcTypes)
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
+            entry.append(f'{school.school_group.name}, {school.name}')
+
             school_entries_descriptions = list()
+
+            for vacancy_entry in self.entries:
+
+                school_name = vacancy_entry.school.name
+
+                if school_name != school.name:
+                    continue
+
+                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
+
+                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
+
+                    entry_type = vacancy_entry.type
+                    entry_hours = vacancy_entry.hours
+                    entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                    entry_description: str = vacancy_entry.description
+
+                    if entry_description is not None and len(entry_description.strip()) > 0:
+                        school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - '
+                                                           f'{entry_description}')
+                else:
+                    continue
+
+            entry.append("\n".join(school_entries_descriptions))
+
+            ges_description_table.append(entry)
+
+        return ges_description_table
+
+    def construct_ses_description_table(self):
+
+        ses_description_table = list()
+
+        header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
+        header.append('Σχολείο')
+        header.append('Παρατηρήσεις')
+
+        ses_description_table.append(header)
+
+        for school in self.specialEducationSchools:
+
+            entry = list()
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
+            entry.append(f'{school.school_group.name}, {school.name}')
+
+            school_entries_descriptions = list()
+
+            for vacancy_entry in self.entries:
+
+                school_name = vacancy_entry.school.name
+
+                if school_name != school.name:
+                    continue
+
+                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
+
+                if 'Ειδικής Αγωγής' in entry_variant:
+                    entry_type = vacancy_entry.type
+                    entry_hours = vacancy_entry.hours
+                    entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                    entry_description: str = vacancy_entry.description
+
+                    if entry_description is not None and len(entry_description.strip()) > 0:
+                        school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - '
+                                                           f'{entry_description}')
+                else:
+                    continue
+
+            entry.append("\n".join(school_entries_descriptions))
+
+            ses_description_table.append(entry)
+
+        return ses_description_table
+
+    def construct_misc_description_table(self):
+
+        misc_description_table = list()
+
+        header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
+        header.append('Σχολείο')
+        header.append('Παρατηρήσεις')
+
+        misc_description_table.append(header)
+
+        for school in self.miscSchools:
+
+            entry = list()
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
+            entry.append(f'{school.school_group.name}, {school.name}')
+
+            school_entries_descriptions = list()
+
+            for vacancy_entry in self.entries:
+
+                school_name = vacancy_entry.school.name
+
+                if school_name != school.name:
+                    continue
+
+                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
+
+                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'] \
+                        or 'Ειδικής Αγωγής' in entry_variant:
+                    continue
+
+                entry_type = vacancy_entry.type
+                entry_hours = vacancy_entry.hours
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                entry_description: str = vacancy_entry.description
+
+                if entry_description is not None and len(entry_description.strip()) > 0:
+                    school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - {entry_description}')
+
+            entry.append("\n".join(school_entries_descriptions))
+
+            misc_description_table.append(entry)
+
+        return misc_description_table
+
+    def createGEStable(self):
+
+        self.gesTable = list()
+
+        header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
+        header.append('Σχολείο')
+        header += self.generalEducationSpcTypes[:]
+
+        self.gesTable.append(header)
+        for school in self.generalEducationSchools:
+
+            entry = list()
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
+            entry.append(f'{school.school_group.name}, {school.name}')
+            sch_values = [0] * len(self.generalEducationSpcTypes)
 
             for vacancy_entry in self.entries:
                 entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
                 school_name = vacancy_entry.school.name
                 entry_type = vacancy_entry.type
                 entry_hours = vacancy_entry.hours
-                entry_specialization = vacancy_entry.specialty.code
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
-                if school_name != sch:
+                if school_name != school.name:
                     continue
 
-                if entry_variant in ['Γενικής Παιδείας - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
-                                     'Γενικής Παιδείας - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
+                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
+                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
                     spcType = f'{entry_specialization} - {entry_variant}'
                     indexScpType = self.generalEducationSpcTypes.index(spcType)
-                    if entry_description is not None and len(entry_description.strip()) > 0:
-                        school_entries_descriptions.append(f'{entry_specialization} - {entry_description}')
 
                     if entry_type == 'Κενό':
                         sch_values[indexScpType] -= int(entry_hours)
@@ -206,7 +375,7 @@ class AggregatedEntriesReport:
                 else:
                     continue
 
-                spcType = f'{entry_specialization} - Γενικής Παιδείας (Σύνολο)'
+                spcType = f'{entry_specialization} - Γενικής Αγωγής (Σύνολο)'
                 if spcType in self.generalEducationSpcTypes:
                     indexScpType = self.generalEducationSpcTypes.index(spcType)
                     if entry_type == 'Κενό':
@@ -215,11 +384,62 @@ class AggregatedEntriesReport:
                         sch_values[indexScpType] += int(entry_hours)
 
             entry += sch_values
-            entry.append("\n".join(school_entries_descriptions))
 
             self.gesTable.append(entry)
 
     def get_workbook(self):
+
+        def filter_headers(header_row):
+            # need to map / manipulate header values
+            for idx, column in enumerate(header_row):
+                if column.endswith('Γενικής Αγωγής (Σύνολο)'):
+                    header_row[idx] = header_row[idx].replace('Γενικής Αγωγής (Σύνολο)', 'Γ.Α. (Σύνολο)')
+                elif column.endswith('Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα'):
+                    header_row[idx] = header_row[idx].replace(
+                        'Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα', 'Γ.Α. - Π.ΕΞ.')
+                elif column.endswith('Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'):
+                    header_row[idx] = header_row[idx].replace(
+                        'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα', 'Γ.Α.')
+
+        def style_description_ws(ws):
+            # style header
+            for col in range(ws.min_column, ws.max_column + 1):
+                ws[get_column_letter(col) + '1'].style = 'header_style_description'
+
+            # update column dimensions
+            dim_holder = DimensionHolder(worksheet=ws)
+            for col in range(ws.min_column, ws.max_column + 1):
+                if col == 1:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=22)
+                elif col == 2:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=35)
+                else:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=150)
+
+            ws.column_dimensions = dim_holder
+
+            # update 1st row height
+            ws.row_dimensions[1] = RowDimension(ws, height=25)
+
+            # update other rows, based on content of 3 column
+            for row in range(ws.min_row+1, ws.max_row + 1):
+
+                cell: Cell = ws[get_column_letter(3) + str(row)]
+
+                # how many new lines we have in the cell
+                count_of_crlf = str(cell.value).count('\n')
+                ws.row_dimensions[row] = RowDimension(ws, height=14 * (count_of_crlf + 1))
+
+            # update cells other than header
+            for row in range(ws.min_row+1, ws.max_row + 1):
+                for col in range(ws.min_column, ws.max_column + 1):
+                    cell: Cell = ws[get_column_letter(col) + str(row)]
+                    if col == 1:
+                        cell.alignment = Alignment(vertical="top")
+                    elif col == 2:
+                        cell.alignment = Alignment(vertical="top")
+                    elif col == 3:
+                        cell.alignment = Alignment(wrapText=True, vertical="top")
 
         def style_ws(ws):
 
@@ -230,11 +450,16 @@ class AggregatedEntriesReport:
             # update column dimensions
             dim_holder = DimensionHolder(worksheet=ws)
             for col in range(ws.min_column, ws.max_column + 1):
-                dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, auto_size=True)
+                if col == 1:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=22)
+                elif col == 2:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=35)
+                else:
+                    dim_holder[get_column_letter(col)] = ColumnDimension(ws, min=col, max=col, width=7)
 
             ws.column_dimensions = dim_holder
             # update 1st row height
-            ws.row_dimensions[1] = RowDimension(ws, height=180)
+            ws.row_dimensions[1] = RowDimension(ws, height=150)
 
         self.getSchools()
         self.createSpecialtiesTypes()
@@ -242,43 +467,90 @@ class AggregatedEntriesReport:
 
         workbook = Workbook()
 
+        # register normal sheet header style
         header_style = NamedStyle(name="header_style")
-        header_style.font = Font(bold=True, size=10)
+        header_style.font = Font(bold=True, size=9)
         bd = Side(style='thick', color="000000")
         header_style.border = Border(bottom=bd)
         header_style.alignment = Alignment(textRotation=90, wrapText=True, horizontal="center", vertical="center")
         workbook.add_named_style(header_style)
 
-        # Γενικής Παιδείας
+        # register "description" sheet header style
+        header_style = NamedStyle(name="header_style_description")
+        header_style.font = Font(bold=True, size=9)
+        bd = Side(style='thick', color="000000")
+        header_style.border = Border(bottom=bd)
+        header_style.alignment = Alignment(wrapText=True, horizontal="center", vertical="center")
+        workbook.add_named_style(header_style)
+
+        # Γενικής Αγωγής
 
         ws = workbook.active
-        ws.title = 'Γενικής Παιδείας'
-        ws.set_printer_settings(paper_size=Worksheet.PAPERSIZE_A4, orientation=Worksheet.ORIENTATION_PORTRAIT)
+        ws.title = 'Γενικής Αγωγής'
 
         if len(self.gesTable) > 1:
+
+            filter_headers(self.gesTable[0])
 
             for row in self.gesTable:
                 ws.append(row)
 
             style_ws(ws)
 
+        # Γενικής Αγωγής Παρατηρήσεις
+        ws = workbook.create_sheet(title='Γενικής Αγωγής Παρατηρήσεις')
+
+        report_rows = self.construct_ges_description_table()
+        if len(report_rows) > 1:
+
+            for row in report_rows:
+                ws.append(row)
+
+            style_description_ws(ws)
+
         # Ειδικής Αγωγής
         ws = workbook.create_sheet(title='Ειδικής Αγωγής')
         if len(self.sesTable) > 1:
+
+            filter_headers(self.sesTable[0])
 
             for row in self.sesTable:
                 ws.append(row)
 
             style_ws(ws)
 
+        # Ειδικής Αγωγής Παρατηρήσεις
+        ws = workbook.create_sheet(title='Ειδικής Αγωγής Παρατηρήσεις')
+
+        report_rows = self.construct_ses_description_table()
+        if len(report_rows) > 1:
+
+            for row in report_rows:
+                ws.append(row)
+
+            style_description_ws(ws)
+
         # Υπόλοιπα
         ws = workbook.create_sheet(title='Υπόλοιπα')
         if len(self.msTable) > 1:
+
+            filter_headers(self.msTable[0])
 
             for row in self.msTable:
                 ws.append(row)
 
             style_ws(ws)
+
+        # Υπόλοιπα Παρατηρήσεις
+        ws = workbook.create_sheet(title='Υπόλοιπα Παρατηρήσεις')
+
+        report_rows = self.construct_misc_description_table()
+        if len(report_rows) > 1:
+
+            for row in report_rows:
+                ws.append(row)
+
+            style_description_ws(ws)
 
         return workbook
 
@@ -554,6 +826,6 @@ def excel_aggregated_entries(request):
     workbook = report.get_workbook()
 
     response = HttpResponse(content=save_virtual_workbook(workbook),
-                            content_type='application/ms-excel')
+                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=kena_aggregated.xlsx'
     return response
