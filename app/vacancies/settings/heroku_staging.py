@@ -23,7 +23,7 @@ DATABASES = {
 # Configure Django App for Heroku.
 try:
     import django_heroku
-    django_heroku.settings(locals())
+    django_heroku.settings(locals(), logging=False)
 except ImportError:
     # probably not running on Heroku
     pass

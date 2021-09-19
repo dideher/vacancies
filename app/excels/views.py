@@ -30,8 +30,10 @@ logger = logging.getLogger(__name__)
 class AggregatedEntriesReport:
 
     def __init__(self):
-
+        started = datetime.now().replace(microsecond=0)
         self.entries: QuerySet[Entry] = Entry.objects.all().order_by("school__school_group__ordering", "school__id")
+        finished = datetime.now().replace(microsecond=0)
+        logger.info("(aggregator) fetched all entries in just '%s'", finished-started)
 
     def createSpecialtiesTypes(self):
         self.generalEducationSpcTypes = SortedSet()
@@ -461,9 +463,20 @@ class AggregatedEntriesReport:
             # update 1st row height
             ws.row_dimensions[1] = RowDimension(ws, height=150)
 
+        started = datetime.now().replace(microsecond=0)
         self.getSchools()
+        finished = datetime.now().replace(microsecond=0)
+        logger.info("(aggregator) completed getSchools() in just '%s'", finished - started)
+
+        started = datetime.now().replace(microsecond=0)
         self.createSpecialtiesTypes()
+        finished = datetime.now().replace(microsecond=0)
+        logger.info("(aggregator) completed createSpecialtiesTypes() in just '%s'", finished - started)
+
+        started = datetime.now().replace(microsecond=0)
         self.createTables()
+        finished = datetime.now().replace(microsecond=0)
+        logger.info("(aggregator) completed createTables() in just '%s'", finished - started)
 
         workbook = Workbook()
 
