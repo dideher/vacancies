@@ -394,14 +394,14 @@ class AggregatedEntriesReport:
         def filter_headers(header_row):
             # need to map / manipulate header values
             for idx, column in enumerate(header_row):
-                if column.endswith('Γενικής Αγωγής (Σύνολο)'):
-                    header_row[idx] = header_row[idx].replace('Γενικής Αγωγής (Σύνολο)', 'Γ.Α. (Σύνολο)')
-                elif column.endswith('Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα'):
+                if column.endswith('- Γενικής Αγωγής (Σύνολο)'):
+                    header_row[idx] = header_row[idx].replace('- Γενικής Αγωγής (Σύνολο)', '- (Συν.)')
+                elif column.endswith('- Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα'):
                     header_row[idx] = header_row[idx].replace(
-                        'Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα', 'Γ.Α. - Π.ΕΞ.')
-                elif column.endswith('Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'):
+                        '- Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα', '- Π.ΕΞ.')
+                elif column.endswith('- Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'):
                     header_row[idx] = header_row[idx].replace(
-                        'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα', 'Γ.Α.')
+                        '- Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα', '')
 
         def style_description_ws(ws):
             # style header
