@@ -5,15 +5,33 @@
     <table class="table table-hover">
         <thead>
             <tr>
+                <td> # </td>
                 <td> Ειδικότητα </td>
                 <td> Λεκτικό </td>
+                <td> Λεκτικό Εκτύπωσης </td>
+                <td> Διαθέσιμο </td>
             </tr>
         </thead>
         <tbody>
         {% for specialty in specialties %}
             <tr>
+                <td> {{ specialty.ordering }} </td>
                 <td> {{ specialty.code }} </td>
                 <td> {{ specialty.lectic }} </td>
+                <td>
+                    {% if specialty.label %}
+                    {{ specialty.label }}
+                    {% else %}
+                    &nbsp;
+                    {% endif %}
+                </td>
+                <td>
+                    {% if specialty.active %}
+                    Ναι
+                    {% else %}
+                    Όχι
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>

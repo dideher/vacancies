@@ -11,6 +11,6 @@ class EntryAdmin(admin.ModelAdmin):
 
 @admin.register(Specialty)
 class SpecialtyAdmin(admin.ModelAdmin):
-    list_display = ('code', 'lectic')
-    search_fields = ('code', 'lectic')
-    ordering = ('code', )
+    list_display = ('ordering', 'code', 'lectic', 'label', 'active')
+    search_fields = ('code', 'lectic', 'label')
+    ordering = ('ordering', )
