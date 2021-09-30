@@ -16,14 +16,14 @@ from history.models import HistoryEntry
 from shared import check_user_is_superuser
 
 
-class SpecialtiesListView(ListView):
+class SpecialtiesListView(LoginRequiredMixin, ListView):
     model = Specialty
     template_name = 'main_app/specialties.html'
     context_object_name = 'specialties'
     paginate_by = 10
 
     def get_queryset(self):
-        return Specialty.objects.all().order_by('code')
+        return Specialty.objects.all().order_by('ordering')
 
 
 class EntryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
