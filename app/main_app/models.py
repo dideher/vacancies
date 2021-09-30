@@ -8,8 +8,11 @@ from schools.models import School
 
 
 class Specialty(models.Model):
-    code = models.CharField(unique=True, max_length=10, verbose_name='Ειδικότητα')
-    lectic = models.CharField(max_length=100, verbose_name='Λεκτικό')
+    code = models.CharField(unique=True, max_length=10, verbose_name=_('Ειδικότητα'))
+    lectic = models.CharField(max_length=100, verbose_name=_('Λεκτικό'), blank=True)
+    label = models.CharField(max_length=100, null=True, blank=True, verbose_name=_('Λεκτικό Εκτύπωσης'))
+    active = models.BooleanField(default=True, verbose_name=_("Διαθέσιμο προς χρήση"))
+    ordering = models.SmallIntegerField(null=True, verbose_name=_("Σειρά"))
 
     def __str__(self):
         return self.code

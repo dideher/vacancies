@@ -13,7 +13,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib import messages
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Count
 from django.http import HttpResponse
 from excel_response import ExcelResponse
 from .forms import UploadFileForm
@@ -27,34 +27,47 @@ from history.models import HistoryEntry
 logger = logging.getLogger(__name__)
 
 
+def str2bool(value: str) -> bool:
+    return value.lower() in ['true', '1', 't', 'y', 'yes', 'ναι']
+
+
 class AggregatedEntriesReport:
 
     def __init__(self):
         started = datetime.now().replace(microsecond=0)
         self.entries: QuerySet[Entry] = Entry.objects.all().order_by("school__school_group__ordering", "school__id")
+
         finished = datetime.now().replace(microsecond=0)
         logger.info("(aggregator) fetched all entries in just '%s'", finished-started)
 
     def createSpecialtiesTypes(self):
-        self.generalEducationSpcTypes = SortedSet()
-        self.specialEducationSpcTypes = SortedSet()
-        self.miscSpcTypes = SortedSet()
 
-        for entry in self.entries:
-            entry_variant = str(EntryVariantType(entry.variant).label)
-            entry_specialization = f'{entry.specialty.code} {entry.specialty.lectic}'
+        general_education_spc_types = list()
+        special_education_spc_types = list()
+        misc_spc_types = list()
+
+        entries: QuerySet[dict] = Entry.objects.order_by('specialty__ordering').values('specialty__code',
+                                                                                       'specialty__lectic',
+                                                                                       'variant').annotate(Count('variant', distinct=True))
+        for entry in entries:
+            entry_variant = str(EntryVariantType(entry.get('variant')).label)
+            entry_specialization = entry.get('specialty__code') + " " + entry.get('specialty__lectic')
+
             if entry_variant == 'Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα':
-                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
-                self.generalEducationSpcTypes.add(
-                    f'{entry_specialization} - Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
-                self.generalEducationSpcTypes.add(f'{entry_specialization} - Γενικής Αγωγής (Σύνολο)')
+                general_education_spc_types.append(f'{entry_specialization} - Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                general_education_spc_types.append(f'{entry_specialization} - Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                general_education_spc_types.append(f'{entry_specialization} - Γενικής Αγωγής (Σύνολο)')
             elif entry_variant == 'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα':
-                self.generalEducationSpcTypes.add(
-                    f'{entry_specialization} - Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
+                general_education_spc_types.append(f'{entry_specialization} - Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα')
             elif 'Ειδικής Αγωγής' in entry_variant:
-                self.specialEducationSpcTypes.add(f'{entry_specialization} - {entry_variant}')
+                special_education_spc_types.append(f'{entry_specialization} - {entry_variant}')
             else:
-                self.miscSpcTypes.add(f'{entry_specialization} - {entry_variant}')
+                misc_spc_types.append(f'{entry_specialization} - {entry_variant}')
+
+        self.generalEducationSpcTypes = general_education_spc_types
+        self.specialEducationSpcTypes = special_education_spc_types
+        self.miscSpcTypes = misc_spc_types
+
 
     def getSchools(self):
         self.generalEducationSchools = list()
@@ -571,44 +584,6 @@ class AggregatedEntriesReport:
 @login_required
 @user_passes_test(check_user_is_superuser)
 @csrf_protect
-def upload_specialties(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                excel_file = request.FILES["file"]
-
-                workbook = load_workbook(excel_file)
-                worksheet = workbook.active
-                excel_data = list()
-                for row in worksheet.iter_rows():
-                    row_data = list()
-                    for cell in row:
-                        if cell.value is None:
-                            text = ""
-                        else:
-                            text = str(cell.value).strip()
-
-                        row_data.append(text)
-                    excel_data.append(row_data)
-
-                Specialty.objects.all().delete()
-
-                for row in excel_data[1:]:
-                    Specialty.objects.create(code=row[0], lectic=row[1])
-            except Exception as e:
-                messages.warning(request, "Κάτι πήγε λάθος...")
-                logger.exception("Something went wrong!")
-
-        return render(request, 'excels/upload_specialties.html', {'form': form, 'excel_data': excel_data})
-    else:
-        form = UploadFileForm()
-        return render(request, 'excels/upload_specialties.html', {'form': form})
-
-
-@login_required
-@user_passes_test(check_user_is_superuser)
-@csrf_protect
 def add_specialties(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -631,7 +606,41 @@ def add_specialties(request):
                     excel_data.append(row_data)
 
                 for row in excel_data[1:]:
-                    Specialty.objects.create(code=row[0], lectic=row[1])
+                    
+                    code = row[0]
+                    lectic = row[1]
+
+                    try:
+                        label = row[2].strip() if row[2] is not None and len(row[2].strip()) > 0 else None
+                    except:
+                        label = None
+
+                    try:
+                        ordering = int(row[3])
+                    except:
+                        ordering = 0
+                    
+                    try:
+                        is_active = str2bool(row[4])
+                    except:
+                        is_active = True
+
+                    try:
+                        # specialty exists
+                        existing_specialty: Specialty = Specialty.objects.get(code=code)
+                        existing_specialty.lectic = lectic
+                        existing_specialty.label = label
+                        existing_specialty.ordering = ordering
+                        existing_specialty.active = is_active
+                        existing_specialty.save()
+                        logger.info("specialty '%s' has been successfully updated", code)
+                    except Specialty.DoesNotExist:
+                        # specialty does not exist, let's create one
+                        Specialty.objects.create(code=code, lectic=lectic, label=label, ordering=ordering, active=is_active)
+                        logger.info("specialty '%s' has been just created", code)
+                        
+
+                    
             except:
                 messages.warning(request,
                                  "Κάτι πήγε λάθος... Μάλλον οι εγγραφές που μόλις φόρτωσες υπήρχαν ήδη στον πίνακα.")
