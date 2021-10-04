@@ -116,7 +116,7 @@ class EntryCreateForm(forms.ModelForm):
 
     specialty = SpecialtyModelChoiceField(
         label=_('Ειδικότητα'),
-        queryset=Specialty.objects.all()
+        queryset=Specialty.objects.filter(active=True).order_by('ordering')
     )
 
     class Meta:
