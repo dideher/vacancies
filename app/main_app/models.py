@@ -104,7 +104,8 @@ class Entry(models.Model):
     variant = models.CharField(
         max_length=64, 
         verbose_name=_('Τύπος Κενού / Πλεονάσματος'), 
-        help_text=_('Επιλέξετε το είδος του κενού'), 
+        help_text=_('Επιλέξετε το είδος του κενού'),
+        choices=EntryVariantType.choices,
         default=EntryVariantType.GENERAL_EDUCATION,
         null=False
     )
