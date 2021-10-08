@@ -351,28 +351,17 @@ class AggregatedEntriesReport:
 
             school_entries_descriptions = list()
 
-            for vacancy_entry in self.entries:
+            school_name = school.name
 
-                school_name = vacancy_entry.school.name
+            for vacancy_entry in self.general_education_entries.get(school_name):
 
-                if school_name != school.name:
-                    continue
+                entry_type = vacancy_entry.type
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                entry_description: str = vacancy_entry.description
 
-                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
-
-                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
-                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα']:
-
-                    entry_type = vacancy_entry.type
-                    entry_hours = vacancy_entry.hours
-                    entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
-                    entry_description: str = vacancy_entry.description
-
-                    if entry_description is not None and len(entry_description.strip()) > 0:
-                        school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - '
-                                                           f'{entry_description}')
-                else:
-                    continue
+                if entry_description is not None and len(entry_description.strip()) > 0:
+                    school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - '
+                                                       f'{entry_description}')
 
             entry.append("\n".join(school_entries_descriptions))
 
@@ -404,26 +393,17 @@ class AggregatedEntriesReport:
 
             school_entries_descriptions = list()
 
-            for vacancy_entry in self.entries:
+            school_name = school.name
 
-                school_name = vacancy_entry.school.name
+            for vacancy_entry in self.special_education_entries.get(school_name):
 
-                if school_name != school.name:
-                    continue
+                entry_type = vacancy_entry.type
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                entry_description: str = vacancy_entry.description
 
-                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
-
-                if 'Ειδικής Αγωγής' in entry_variant:
-                    entry_type = vacancy_entry.type
-                    entry_hours = vacancy_entry.hours
-                    entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
-                    entry_description: str = vacancy_entry.description
-
-                    if entry_description is not None and len(entry_description.strip()) > 0:
-                        school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - '
-                                                           f'{entry_description}')
-                else:
-                    continue
+                if entry_description is not None and len(entry_description.strip()) > 0:
+                    school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - '
+                                                       f'{entry_description}')
 
             entry.append("\n".join(school_entries_descriptions))
 
@@ -455,22 +435,11 @@ class AggregatedEntriesReport:
 
             school_entries_descriptions = list()
 
-            for vacancy_entry in self.entries:
+            school_name = school.name
 
-                school_name = vacancy_entry.school.name
-
-                if school_name != school.name:
-                    continue
-
-                entry_variant = str(EntryVariantType(vacancy_entry.variant).label)
-
-                if entry_variant in ['Γενικής Αγωγής - Πανελλαδικώς Εξεταζόμενα Μαθήματα',
-                                     'Γενικής Αγωγής - μη Πανελλαδικώς Εξεταζόμενα Μαθήματα'] \
-                        or 'Ειδικής Αγωγής' in entry_variant:
-                    continue
+            for vacancy_entry in self.misc_entries.get(school_name):
 
                 entry_type = vacancy_entry.type
-                entry_hours = vacancy_entry.hours
                 entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
                 entry_description: str = vacancy_entry.description
 
@@ -482,6 +451,88 @@ class AggregatedEntriesReport:
             misc_description_table.append(entry)
 
         return misc_description_table
+
+    def construct_tmimata_entaksis_description_table(self):
+
+        description_table = list()
+
+        header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
+        header.append('Σχολείο')
+        header.append('Παρατηρήσεις')
+
+        description_table.append(header)
+
+        for school in self.tmimata_entaksis_schools:
+
+            entry = list()
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
+            entry.append(f'{school.school_group.name}, {school.name}')
+
+            school_entries_descriptions = list()
+
+            school_name = school.name
+
+            for vacancy_entry in self.tmimata_entaksis_entries.get(school_name):
+
+                entry_type = vacancy_entry.type
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                entry_description: str = vacancy_entry.description
+
+                if entry_description is not None and len(entry_description.strip()) > 0:
+                    school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - {entry_description}')
+
+            entry.append("\n".join(school_entries_descriptions))
+
+            description_table.append(entry)
+
+        return description_table
+
+    def construct_paralili_stiriksi_description_table(self):
+
+        description_table = list()
+
+        header = list()
+        header.append('Ημ/νια Επικαιροποίησης')
+        header.append('Σχολείο')
+        header.append('Παρατηρήσεις')
+
+        description_table.append(header)
+
+        for school in self.paralili_stiriksi_schools:
+
+            entry = list()
+
+            if school.managed_by.status_time is None:
+                entry.append("")
+            else:
+                entry.append(school.managed_by.status_time.strftime('%d/%m/%Y, %H:%M:%S'))
+
+            entry.append(f'{school.school_group.name}, {school.name}')
+
+            school_entries_descriptions = list()
+
+            school_name = school.name
+
+            for vacancy_entry in self.paralili_stiriksi_entries.get(school_name):
+
+                entry_type = vacancy_entry.type
+                entry_specialization = f'{vacancy_entry.specialty.code} {vacancy_entry.specialty.lectic}'
+                entry_description: str = vacancy_entry.description
+
+                if entry_description is not None and len(entry_description.strip()) > 0:
+                    school_entries_descriptions.append(f'{entry_specialization} - {entry_type} - {entry_description}')
+
+            entry.append("\n".join(school_entries_descriptions))
+
+            description_table.append(entry)
+
+        return description_table
 
     def createGEStable(self):
 
@@ -686,6 +737,17 @@ class AggregatedEntriesReport:
 
             style_ws(ws)
 
+        # Τμήματα Ένταξης Παρατηρήσεις
+        ws = workbook.create_sheet(title='Τμήματα Ένταξης Παρατηρήσεις')
+
+        report_rows = self.construct_tmimata_entaksis_description_table()
+        if len(report_rows) > 1:
+
+            for row in report_rows:
+                ws.append(row)
+
+            style_description_ws(ws)
+
         # Παράλληλη Στήριξη
         ws = workbook.create_sheet(title='Παράλληλη Στήριξη')
         if len(paralili_stiriksi_table) > 1:
@@ -696,6 +758,17 @@ class AggregatedEntriesReport:
                 ws.append(row)
 
             style_ws(ws)
+
+        # Παράλληλη Στήριξη Παρατηρήσεις
+        ws = workbook.create_sheet(title='Παράλληλη Στήριξη Παρατηρήσεις')
+
+        report_rows = self.construct_paralili_stiriksi_description_table()
+        if len(report_rows) > 1:
+
+            for row in report_rows:
+                ws.append(row)
+
+            style_description_ws(ws)
 
         # Ειδικής Αγωγής
         ws = workbook.create_sheet(title='Ειδικής Αγωγής')
