@@ -48,9 +48,9 @@
         </div>
     </nav>
 </header>
-<main role="main" class="container">
+<div role="main" class="container-fluid">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-9">
             {% if messages %}
                 {% for message in messages %}
                     {% if message.tags != 'error' %}
@@ -71,7 +71,7 @@
         </div>
         {% if user.is_authenticated %}
             {% if user.is_superuser %}
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <ul class="list-group">
                         <!-- <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="/admin/">Διαχείριση Βάσης</a>
@@ -140,7 +140,17 @@
                     </ul>
                 </div>
             {% else %}
-                <div class="col-md-4">
+                <div class="col-md-3">
+
+                    <ul class="list-group mb-2">
+                        <li class="list-group-item list-group-item-light sidebar">
+                            <a class="sidebar-item" href="{% url 'covid19:covid19_entries' %}">
+                                <i class="bi bi-shield-exclamation"></i>
+                                <strong>Διαχείριση Κενών COVID-19</strong>
+                            </a>
+                        </li>
+                    </ul>
+
                     <ul class="list-group">
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'users:info' %}">Πληροφορίες για το Σχολείο</a>
@@ -173,12 +183,15 @@
                             <a class="sidebar-item" href="{% url 'main_app:about' %}">Σχετικά με την εφαρμογή</a>
                         </li>
                     </ul>
+
+
+
                 </div>
             {% endif %}
         {% endif %}
         {% block content-section %}{% endblock %}
     </div>
-</main>
+</div>
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

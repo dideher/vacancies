@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'schools',
     'excels',
     'pdfs',
+    'covid19',
 ]
 
 MIDDLEWARE = [
@@ -91,7 +92,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'el'
+
+LOCALE = 'el_gr@euro'
 
 TIME_ZONE = 'Europe/Athens'
 
