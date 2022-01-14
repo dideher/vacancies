@@ -13,7 +13,7 @@ from django.views.generic import (
 from .models import Specialty, Entry
 from .forms import EntryCreateForm, EntryUpdateForm
 from history.models import HistoryEntry
-from shared import check_user_is_superuser
+from vacancies.utils.permissions import check_user_is_superuser
 
 
 class SpecialtiesListView(LoginRequiredMixin, ListView):

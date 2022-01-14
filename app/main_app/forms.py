@@ -1,23 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+
+from vacancies.utils.form import SpecialtyModelChoiceField
 from .models import Entry, EntryVariantType, Specialty
-
-
-class SpecialtyModelChoiceField(forms.ModelChoiceField):
-
-    def label_from_instance(self, obj):
-        """
-        Convert objects into strings and generate the labels for the choices
-        presented by this object. Subclasses can override this method to
-        customize the display of the choices.
-        """
-        if isinstance(obj, Specialty):
-            sp: Specialty = obj
-            return f'{sp.code} - {sp.lectic}'
-        else:
-            return str(obj)
-
-
 
 VALID_ENTRY_VARIANTS_DEFAULT = (
     EntryVariantType.GENERAL_EDUCATION ,

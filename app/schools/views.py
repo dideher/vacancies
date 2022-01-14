@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic import ListView, DetailView
 from .models import School
 from users.models import Profile
-from shared import check_user_is_superuser
+from vacancies.utils.permissions import check_user_is_superuser
 
 
 class SchoolDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):

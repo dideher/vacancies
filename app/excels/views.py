@@ -17,7 +17,7 @@ from django.db.models import QuerySet, Count
 from django.http import HttpResponse
 from excel_response import ExcelResponse
 from .forms import UploadFileForm
-from shared import check_user_is_superuser
+from vacancies.utils.permissions import check_user_is_superuser
 from main_app.models import Entry, Specialty, EntryVariantType
 from schools.models import School
 from users.models import Profile
