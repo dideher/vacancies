@@ -8,23 +8,38 @@ from vacancies.commons import EntryHistoryEventType
 
 
 class Covid19Entry(models.Model):
-    teacher_name = models.CharField(blank=True, max_length=32, default='', verbose_name='Όνομα Εκπ/ου', help_text="")
-    teacher_surname = models.CharField(blank=True, max_length=32, default='', verbose_name='Επώνυμο Εκπ/ου', help_text="")
-    teacher_registry = models.IntegerField(blank=True, null=True, default=None, verbose_name='Α.Μ.')
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='covid19_entries', null=True, default=None)
+    teacher_name = models.CharField(blank=True, max_length=32, default='', verbose_name='Όνομα Εκπαιδευτικού',
+                                    help_text="Συμπληρώστε το όνομα του νοσούντα. Εναλλακτικά, μπορείτε να "
+                                              "δηλώστε μόνο το Α.Μ.")
+    teacher_surname = models.CharField(blank=True, max_length=32, default='', verbose_name='Επώνυμο Εκπαιδευτικού',
+                                       help_text="Συμπληρώστε το επώνυμο του νοσούντα. Εναλλακτικά, μπορείτε να "
+                                                 "δηλώστε μόνο το Α.Μ.")
+    teacher_registry = models.IntegerField(blank=True, null=True, default=None, verbose_name='Α.Μ.',
+                                           help_text='Δηλώστε το Α.Μ. του νοσούντα εκπαιδευτικού. Αν δηλώσετε Α.Μ. '
+                                                     'τότε ΔΕΝ χρειάζεται να δηλώσετε και το πλήρες ονοματεπώνυμο '
+                                                     'του νοσούντα')
+    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='covid19_entries', null=True,
+                               default=None)
 
-    specialty = models.ForeignKey('main_app.Specialty', on_delete=models.CASCADE, verbose_name='Ειδικότητα', null=True)
+    specialty = models.ForeignKey('main_app.Specialty', on_delete=models.CASCADE, verbose_name='Ειδικότητα',
+                                  null=True, help_text='Συμπληρώστε την ειδικότητα του νοσούντα')
     hours = models.IntegerField(default=0, validators=[MinValueValidator(1)],
                                 error_messages={'min_value': "Η τιμή πρέπει να είναι μεγαλύτερη του 0."},
-                                help_text="Η τιμή πρέπει να είναι μεγαλύτερη του 0.",
-                                verbose_name='Ώρες')
-    illness_started = models.DateField(auto_now=True, verbose_name='Ημ/νια Νόσησης', null=False)
-    illness_end_estimation = models.DateField(auto_now=False, verbose_name='Ημ/νια Πιθανής Επιστροφής', null=True, blank=True)
+                                help_text="Δηλώστε τις ώρες διδασκαλίας του νοσούντα στην μονάδα σας (μην δηλώσετε "
+                                          "το υποχρεωτικό ωράριο του εκπαιδευτικού)",
+                                verbose_name='Ώρες Διδασκαλίας')
+    illness_started = models.DateField(auto_now=False, verbose_name='Ημερομηνία Νόσησης',
+                                       help_text='Καταχωρήστε την ημερομηνία νόσησης του εκπαιδευτικού', null=False)
+    illness_end_estimation = models.DateField(auto_now=False, verbose_name='Ημερομηνία Πιθανής Επιστροφής',
+                                              help_text='Καταχωρήστε την πιθανή (αν την γνωρίζετε) ημερομηνία '
+                                                        'επιστροφής του εκπαιδευτικού στην μονάδα', null=True,
+                                              blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     created_on = models.DateTimeField(auto_now=True, null=False, blank=False)
     deleted_on = models.DateTimeField(auto_now=False, null=True, blank=True)
     comments = models.TextField(verbose_name='Παρατηρήσεις', blank=True,
-                                help_text='Καταχωρίστε τυχόν παρατηρήσεις που μπορεί να έχετε για το συγεκριμένο προσωρινό COVID-19 κενό',
+                                help_text='Καταχωρίστε τυχόν παρατηρήσεις που μπορεί να έχετε για το συγεκριμένο '
+                                          'προσωρινό COVID-19 κενό',
                                 default='')
 
     class Meta:
