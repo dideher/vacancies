@@ -1,14 +1,9 @@
-from django.shortcuts import render
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.contrib.auth.decorators import user_passes_test, login_required
 from django.utils import timezone
 from django.db import transaction
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
-from vacancies.utils.permissions import check_user_is_school
 from django.contrib.auth.models import User
 from django.views.generic import (
     ListView,
@@ -32,8 +27,8 @@ class Covid19EntryListView(LoginRequiredMixin, UserIsAssociatedWithASchoolTestMi
     def get_queryset(self):
 
         user_profile: Profile = self.request.user.profile
-
-        return Covid19Entry.objects.filter(school=user_profile.school, deleted_on__isnull=True).order_by('specialty__code')
+        base_qs = super(Covid19EntryListView, self).get_queryset()
+        return base_qs.filter(school=user_profile.school, deleted_on__isnull=True).order_by('specialty__code')
 
 
 class Covid19EntryDetailView(LoginRequiredMixin, UserIsAssociatedWithASchoolTestMixin, DetailView):
@@ -86,6 +81,10 @@ class Covid19EntryDeleteView(LoginRequiredMixin, UserIsAssociatedWithASchoolTest
 
     model = Covid19Entry
 
+    def get_queryset(self):
+        base_qs = super(Covid19EntryDeleteView, self).get_queryset()
+        return base_qs.filter(school=self.request.user.profile.school, deleted_on__isnull=True)
+
     def delete(self, *args, **kwargs):
         with transaction.atomic():
             entry_to_delete: Covid19Entry = self.get_object()
@@ -117,6 +116,10 @@ class Covid19EntryUpdateView(LoginRequiredMixin, UserIsAssociatedWithASchoolTest
     template_name_suffix = '_update_form'
 
     success_url = reverse_lazy('covid19:covid19_entries')
+
+    def get_queryset(self):
+        base_qs = super(Covid19EntryUpdateView, self).get_queryset()
+        return base_qs.filter(school=self.request.user.profile.school, deleted_on__isnull=True)
 
     def form_valid(self, form):
 
