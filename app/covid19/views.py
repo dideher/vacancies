@@ -31,10 +31,6 @@ class Covid19EntryListView(LoginRequiredMixin, UserIsAssociatedWithASchoolTestMi
         return base_qs.filter(school=user_profile.school, deleted_on__isnull=True).order_by('specialty__code')
 
 
-class Covid19EntryDetailView(LoginRequiredMixin, UserIsAssociatedWithASchoolTestMixin, DetailView):
-    model = Covid19Entry
-
-
 class Covid19EntryCreateView(LoginRequiredMixin, UserIsAssociatedWithASchoolTestMixin, CreateView):
     model = Covid19Entry
     form_class = Covid19EntryCreateForm
