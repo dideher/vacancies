@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from vacancies.commons import EntryHistoryEventType
@@ -23,7 +23,7 @@ class Covid19Entry(models.Model):
 
     specialty = models.ForeignKey('main_app.Specialty', on_delete=models.CASCADE, verbose_name='Ειδικότητα',
                                   null=True, help_text='Συμπληρώστε την ειδικότητα του νοσούντα')
-    hours = models.IntegerField(default=0, validators=[MinValueValidator(1)],
+    hours = models.IntegerField(default=0, validators=[MinValueValidator(1), MaxValueValidator(24)],
                                 error_messages={'min_value': "Η τιμή πρέπει να είναι μεγαλύτερη του 0."},
                                 help_text="Δηλώστε τις ώρες διδασκαλίας του νοσούντα στην μονάδα σας (μην δηλώσετε "
                                           "το υποχρεωτικό ωράριο του εκπαιδευτικού)",
@@ -47,6 +47,10 @@ class Covid19Entry(models.Model):
             models.Index(fields=['school', 'specialty']),
             models.Index(fields=['created_on']),
         ]
+
+    def __str__(self):
+        return f'{self.teacher_surname} {self.teacher_name} ({self.teacher_registry if self.teacher_registry else ""})' \
+               f' [{self.specialty} - #{self.hours}] - ({self.illness_started} - {self.illness_end_estimation})'
 
 
 class Covid19EntryEventHistory(models.Model):

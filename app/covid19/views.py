@@ -40,7 +40,7 @@ class Covid19EntryDetailView(LoginRequiredMixin, UserIsAssociatedWithASchoolTest
     model = Covid19Entry
 
 
-class Covid19EntryCreateView(LoginRequiredMixin, CreateView):
+class Covid19EntryCreateView(LoginRequiredMixin, UserIsAssociatedWithASchoolTestMixin, CreateView):
     model = Covid19Entry
     form_class = Covid19EntryCreateForm
 
@@ -82,7 +82,7 @@ class Covid19EntryCreateView(LoginRequiredMixin, CreateView):
             return super().form_valid(form)
 
 
-class Covid19EntryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class Covid19EntryDeleteView(LoginRequiredMixin, UserIsAssociatedWithASchoolTestMixin, DeleteView):
 
     model = Covid19Entry
 
@@ -109,40 +109,36 @@ class Covid19EntryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 
         return HttpResponseRedirect(reverse('covid19:covid19_entries'))
 
-    def test_func(self):
-        # entry = self.get_object()
-        #
-        # if self.request.user == entry.owner:
-        #     return True
-        #
-        # return False
-        return True
 
-
-class Covid19EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class Covid19EntryUpdateView(LoginRequiredMixin, UserIsAssociatedWithASchoolTestMixin, UpdateView):
     model = Covid19Entry
     form_class = Covid19EntryUpdateForm
-    template_name = 'main_app/entry_update.html'
     context_object_name = 'entry'
+    template_name_suffix = '_update_form'
 
-    success_url = '/user_entries/'
+    success_url = reverse_lazy('covid19:covid19_entries')
 
     def form_valid(self, form):
+
         original_data = self.get_object()
+        updated_data = form.instance
+
         self.request.user.profile.status = False
         self.request.user.profile.status_time = None
         self.request.user.profile.save()
-        # HistoryEntry.objects.create(specialty=original_data.specialty, owner=original_data.owner,
-        #                             hours=original_data.hours, date_time=original_data.date_time,
-        #                             type=original_data.type,
-        #                             description=original_data.description, variant=original_data.variant)
+
+        updated_datetime = timezone.now()
+
+        Covid19EntryEventHistory.objects.create(
+            covid_entry=original_data,
+            created_by=self.request.user,
+            event_datetime=updated_datetime,
+            event_type=EntryHistoryEventType.HISTORY_EVENT_UPDATE,
+            event_description=f"H εγγραφή '{original_data}' τροποποιήθηκε σε '{updated_data}'"
+        )
+
+        messages.success(self.request, "Η ενημέρωση του κενού COVID-19 ήταν επιτυχής")
 
         return super().form_valid(form)
 
-    def test_func(self):
-        entry = self.get_object()
 
-        if self.request.user == entry.owner:
-            return True
-
-        return False

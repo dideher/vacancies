@@ -40,7 +40,7 @@
                 <td> {{ entry.illness_started|date:"d M Y" }}</td>
                 <td> {{ entry.illness_end_estimation|date:"d M Y" }}</td>
                 <td>
-                    <a href="{% url 'covid19:covid19_entry_detail' entry.pk %}" class="btn btn-success btn-sm" role="button">
+                    <a href="{% url 'covid19:covid19_entry_update' entry.pk %}" class="btn btn-success btn-sm" role="button">
                         <i class="bi bi-pencil-square"></i>
                     </a>
                     &nbsp;
