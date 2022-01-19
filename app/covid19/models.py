@@ -36,7 +36,8 @@ class Covid19Entry(models.Model):
                                               blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     created_on = models.DateTimeField(auto_now=True, null=False, blank=False)
-    deleted_on = models.DateTimeField(auto_now=False, null=True, blank=True)
+    updated_on = models.DateTimeField(auto_now=False, default=None, null=True, blank=True)
+    deleted_on = models.DateTimeField(auto_now=False, default=None, null=True, blank=True)
     comments = models.TextField(verbose_name='Παρατηρήσεις', blank=True,
                                 help_text='Καταχωρίστε τυχόν παρατηρήσεις που μπορεί να έχετε για το συγεκριμένο '
                                           'προσωρινό COVID-19 κενό',
