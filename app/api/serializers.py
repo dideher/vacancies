@@ -13,14 +13,14 @@ class SpecialtySerializer(serializers.ModelSerializer):
 class SchoolSerializer(serializers.ModelSerializer):
 
     # If the profile associated with the school has "validated" all entries
-    is_current = serializers.SerializerMethodField(read_only=True)
+    is_finalized = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = School
         fields = ['id', 'email', 'principal', 'phone', 'address', 'name', 'school_type', 'school_timetable',
-                  'school_variant', 'is_current']
+                  'school_variant', 'is_finalized']
 
-    def get_is_current(self, obj):
+    def get_is_finalized(self, obj):
         # type: (SchoolSerializer, School) -> bool
         try:
             return obj.managed_by.status
