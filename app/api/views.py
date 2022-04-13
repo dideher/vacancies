@@ -44,6 +44,15 @@ class SchoolEntryList(viewsets.ViewSetMixin, generics.ListAPIView):
         return Entry.objects.filter(school=school_pk).order_by('specialty')
 
 
+class SchoolPendingList(viewsets.ViewSetMixin, generics.ListAPIView):
+    """
+    Returns the list of school that are still pending (not finalized their entries)
+    """
+    queryset = School.objects.filter(managed_by__status=False).order_by('name')
+    serializer_class = SchoolSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
 def reconnect_users_to_schools(user=None):
     # type: (User) -> List[Profile]
     if user is None:
