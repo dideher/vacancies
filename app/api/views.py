@@ -51,32 +51,3 @@ class SchoolPendingList(viewsets.ViewSetMixin, generics.ListAPIView):
     queryset = School.objects.filter(managed_by__status=False).order_by('name')
     serializer_class = SchoolSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-
-def reconnect_users_to_schools(user=None):
-    # type: (User) -> List[Profile]
-    if user is None:
-        # we are working for all users
-        profiles = Profile.objects.all()  # type: list[Profile]
-    else:
-        profiles = [user.profile, ]  # type: list[Profile]
-
-    # store the associated (actually processed) users/profile in a list
-    associated_users = list()
-
-    for profile in profiles:
-        try:
-            school = School.objects.get(email=profile.user.email)  # type: School
-
-            profile.user.last_name = school.name
-            profile.user.save()
-
-            profile.verified = True
-            profile.school = school
-            profile.save()
-
-            associated_users.append(profile)
-        except School.DoesNotExist:
-            pass
-
-    return associated_users
