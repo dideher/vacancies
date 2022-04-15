@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from schools.models import School
 from users.models import Profile
+from django_filters.rest_framework import DjangoFilterBackend
 from main_app.models import Entry, Specialty
 from api.serializers import SchoolSerializer, EntrySerializer, SpecialtySerializer
 
@@ -25,14 +26,6 @@ class SchoolViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class EntryViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    TODO: Add docstring
-    """
-    queryset = Entry.objects.all().order_by('specialty')
-    serializer_class = EntrySerializer
-
-
 class SchoolEntryList(viewsets.ViewSetMixin, generics.ListAPIView):
 
     queryset = Entry.objects.all().order_by('specialty')
@@ -51,3 +44,16 @@ class SchoolPendingList(viewsets.ViewSetMixin, generics.ListAPIView):
     queryset = School.objects.filter(managed_by__status=False).order_by('name')
     serializer_class = SchoolSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class EntryList(viewsets.ViewSetMixin, generics.ListAPIView):
+    """
+    Returns a list of all entries
+    """
+    queryset = Entry.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['variant', 'type', 'specialty']
+    serializer_class = EntrySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
