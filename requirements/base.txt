@@ -26,3 +26,4 @@ djangorestframework==3.12.4
 Markdown==3.3.4
 django-impersonate
 sortedcontainers
+django-filter
