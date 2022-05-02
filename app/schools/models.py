@@ -25,6 +25,7 @@ class SchoolVariant(models.TextChoices):
 class School(models.Model):
     email = models.EmailField(unique=True, null=True, verbose_name='Email Σχολείου')
     name = models.CharField(max_length=100, null=True, verbose_name='Όνομα Σχολείου')
+    ministry_code = models.CharField(max_length=18, null=True, verbose_name='Κωδικός Υπουργείου')
     principal = models.CharField(max_length=100, null=True, verbose_name='Διευθυντής Σχολείου')
     phone = models.CharField(max_length=15, null=True, verbose_name='Τηλέφωνο Σχολείου')
     address = models.CharField(max_length=100, null=True, verbose_name='Διεύθυνση Σχολείου')
