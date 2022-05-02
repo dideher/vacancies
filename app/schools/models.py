@@ -29,6 +29,7 @@ class School(models.Model):
     principal = models.CharField(max_length=100, null=True, verbose_name='Διευθυντής Σχολείου')
     phone = models.CharField(max_length=15, null=True, verbose_name='Τηλέφωνο Σχολείου')
     address = models.CharField(max_length=100, null=True, verbose_name='Διεύθυνση Σχολείου')
+    sibling_school = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
     school_type = models.CharField(
         max_length=16,
         verbose_name=_('Έιδος Σχολείου'),
