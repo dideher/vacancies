@@ -6,12 +6,16 @@
         <table class="table">
             <tbody>
             <tr>
+                <td style="width: 40%">Κωδικός Υπουργείου</td>
+                <td>{{ school.ministry_code|default:'-' }}</td>
+            </tr>
+            <tr>
                 <td style="width: 40%">Ονομασία</td>
                 <td>{{ school.name }}</td>
             </tr>
             <tr>
                 <td>Email</td>
-                <td>{{ school.email }}</td>
+                <td><a href="mailto:{{ school.email }}"><code>{{ school.email }}</code></a></td>
             </tr>
             <tr>
                 <td>Διευθυντής</td>

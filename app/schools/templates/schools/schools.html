@@ -5,7 +5,9 @@
     <table class="table table-hover table-sm">
         <thead class="thead-light">
             <tr>
+                <th>Κωδ.</th>
                 <th>Σχολείο</th>
+                <th>Email</th>
                 <th>Διευθυντής</th>
                 <th>Τηλέφωνο</th>
                 <th>Πληροφορίες</th>
@@ -14,8 +16,10 @@
         <tbody>
         {% for school in schools %}
             <tr>
+                <td> {{ school.ministry_code|default:'-' }} </td>
                 <td> {{ school.name }} </td>
-                <td> {{ school.principal|default:'-'|truncatechars:30 }} </td>
+                <td> <a href="mailto:{{ school.email }}"><code>{{ school.email }}</code></a></td>
+                <td> {{ school.principal|default:'-'|truncatechars:25 }} </td>
                 <td> {{ school.phone|default:'-'|truncatechars:13 }} </td>
                 <td style="text-align: center">
                     <a href="{% url 'schools:school_detail' school.id %}">
