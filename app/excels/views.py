@@ -971,7 +971,8 @@ def add_schools(request):
                             group_tag = school_group.neighboring_tag
 
                             if len(neighboring_groups) > 0:
-                                neighboring_groups_list = [get_or_create_school_group(x.strip()) for x in neighboring_groups.split(',')]
+                                neighboring_groups_list = [get_or_create_school_group(x.strip()) for x in
+                                                           neighboring_groups.split(',')]
                             else:
                                 neighboring_groups_list = list()
 
@@ -1021,7 +1022,6 @@ def add_schools(request):
                             existing_school.address = address
                             existing_school.principal = principal
                             existing_school.phone = phone
-                            existing_school.neighboring_groups = neighboring_groups
                             existing_school.ministry_code = ministry_code
                             existing_school.save()
                         else:
@@ -1036,7 +1036,6 @@ def add_schools(request):
                                 address=address,
                                 principal=principal,
                                 phone=phone,
-                                neighboring_groups=neighboring_groups,
                                 ministry_code=ministry_code
                             )
 
