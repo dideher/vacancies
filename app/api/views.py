@@ -2,10 +2,11 @@ from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework import permissions
 from schools.models import School
-from users.models import Profile
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from main_app.models import Entry, Specialty
-from api.serializers import SchoolSerializer, EntrySerializer, SpecialtySerializer
+from api.serializers import SchoolSerializer, EntrySerializer, SpecialtySerializer, SchoolDetailSerializer
 
 
 class SpecialtyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -17,13 +18,23 @@ class SpecialtyViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class SchoolViewSet(viewsets.ReadOnlyModelViewSet):
+class SchoolViewSet(viewsets.ViewSet):
     """
-    API endpoint for retrieving schools.
+    A simple ViewSet for listing or retrieving schools.
     """
-    queryset = School.objects.all().order_by('name')
-    serializer_class = SchoolSerializer
+
     permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        queryset = School.objects.all().order_by('name')
+        serializer = SchoolSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = School.objects.all()
+        user = get_object_or_404(queryset, ministry_code=pk)
+        serializer = SchoolDetailSerializer(user)
+        return Response(serializer.data)
 
 
 class SchoolEntryList(viewsets.ViewSetMixin, generics.ListAPIView):
