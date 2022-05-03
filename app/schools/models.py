@@ -59,6 +59,12 @@ class School(models.Model):
                                      on_delete=models.SET_NULL,
                                      null=True,
                                      related_name='schools')
+    # for simplicity, this will be a comma separated list of school group ids
+    neighboring_groups = models.CharField(
+        max_length=32,
+        verbose_name=_('Όμορες Ομάδες'),
+        null=True
+    )
 
     def __str__(self):
         return f'{self.name}'
