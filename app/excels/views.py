@@ -1,4 +1,5 @@
 import logging
+from django.utils.crypto import get_random_string
 from datetime import datetime
 from openpyxl import Workbook, load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
@@ -19,9 +20,10 @@ from excel_response import ExcelResponse
 from .forms import UploadFileForm
 from vacancies.utils.permissions import check_user_is_superuser
 from main_app.models import Entry, Specialty, EntryVariantType
-from schools.models import School
+from schools.models import School, SchoolGroup
 from users.models import Profile
 from history.models import HistoryEntry
+from django.db import transaction
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -888,46 +890,28 @@ def add_specialties(request):
         return render(request, 'excels/add_specialties.html', {'form': form})
 
 
-@login_required
-@user_passes_test(check_user_is_superuser)
-@csrf_protect
-def upload_schools(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                excel_file = request.FILES["file"]
+def get_or_create_school_group(school_group_number: int) -> SchoolGroup:
 
-                workbook = load_workbook(excel_file)
-                worksheet = workbook.active
-                excel_data = list()
-                for row in worksheet.iter_rows():
-                    row_data = list()
-                    for cell in row:
-                        if cell.value is None:
-                            text = ""
-                        else:
-                            text = str(cell.value).strip()
+    school_group_name = f"{school_group_number}η ομάδα"  # sorry about that
+    try:
+        return SchoolGroup.objects.get(name=school_group_name)
+    except SchoolGroup.DoesNotExist:
+        # school group does not exist, go ahead and create one
+        return SchoolGroup.objects.create(name=school_group_name)
 
-                        row_data.append(text)
-                    excel_data.append(row_data)
 
-                School.objects.all().delete()
-                Profile.objects.all().update(verified=False)
-                User.objects.all().update(last_name='')
+def get_or_create_sibling_school(school_ministry_code: str) -> School:
+    try:
+        return School.objects.get(ministry_code=school_ministry_code)
+    except School.DoesNotExist:
+        # school does not exist. Create a sibling school with radnom data that will
+        # be fixed anyway, during the school upload process
 
-                for row in excel_data[1:]:
-                    School.objects.create(name=row[0], email=row[1], principal=row[2], phone=row[3], address=row[4])
-
-                reconnect_users_to_schools()
-            except:
-                messages.warning(request, "Κάτι πήγε λάθος...")
-                logger.exception("Something went wrong!")
-
-        return render(request, 'excels/upload_schools.html', {'form': form, 'excel_data': excel_data})
-    else:
-        form = UploadFileForm()
-        return render(request, 'excels/upload_schools.html', {'form': form})
+        return School.objects.create(
+            ministry_code=school_ministry_code,
+            email=f'{get_random_string(length=12)}@example.gr',
+            name=get_random_string(length=16)
+        )
 
 
 @login_required
@@ -939,6 +923,7 @@ def add_schools(request):
         if form.is_valid():
             try:
                 excel_file = request.FILES["file"]
+                purge_existing_schools = form.cleaned_data.get('purge_existing_schools', False)
 
                 workbook = load_workbook(excel_file)
                 worksheet = workbook.active
@@ -954,10 +939,108 @@ def add_schools(request):
                         row_data.append(text)
                     excel_data.append(row_data)
 
-                for row in excel_data[1:]:
-                    School.objects.create(name=row[0], email=row[1], principal=row[2], phone=row[3], address=row[4])
+                with transaction.atomic():
 
-                reconnect_nv_users_to_schools()
+                    if purge_existing_schools:
+                        School.objects.all().delete()
+                        Profile.objects.all().update(verified=False)
+                        User.objects.all().update(last_name='')
+
+                    for row in excel_data[1:]:
+                        ministry_code = row[0]
+                        sibling_school_ministry_code = row[1]
+                        school_group_number = row[2]
+                        neighboring_groups = row[3]
+                        school_type = row[4]
+                        school_variant = row[5]
+                        myschool_school_name = row[6]
+                        school_name = row[7]
+                        email = row[8]
+                        principal = row[9]
+                        phone = row[10]
+                        address = row[11]
+
+                        if len(school_group_number) > 0:
+                            school_group = get_or_create_school_group(int(school_group_number))
+                        else:
+                            school_group = None
+
+                        if school_group is not None:
+                            # handle neighboring groups of group
+                            neighboring_groups_list = list()
+                            group_tag = school_group.neighboring_tag
+
+                            if len(neighboring_groups) > 0:
+                                neighboring_groups_list = [get_or_create_school_group(x.strip()) for x in neighboring_groups.split(',')]
+                            else:
+                                neighboring_groups_list = list()
+
+                            if group_tag is None:
+                                for neighboring_group in neighboring_groups_list:
+                                    if neighboring_group.neighboring_tag is not None:
+                                        group_tag = neighboring_group.neighboring_tag
+                                        break
+
+                            if group_tag is None:
+                                group_tag = get_random_string(5)
+
+                            school_group.neighboring_tag = group_tag
+                            school_group.save()
+
+                            for neighboring_group in neighboring_groups_list:
+                                neighboring_group.neighboring_tag = group_tag
+                                neighboring_group.save()
+
+                        try:
+                            existing_school: School = School.objects.get(email=email)
+                        except School.DoesNotExist:
+                            existing_school = None
+
+                        # if we failed to fetch existing school by email, give it another try
+                        # with ministry code. We need this due to the sibling school code as well
+                        if existing_school is None:
+                            try:
+                                existing_school: School = School.objects.get(ministry_code=ministry_code)
+                            except School.DoesNotExist:
+                                existing_school = None
+
+                        if len(sibling_school_ministry_code) > 0:
+                            sibling_school = get_or_create_sibling_school(school_ministry_code=sibling_school_ministry_code)
+                        else:
+                            sibling_school = None
+
+                        if existing_school is not None:
+                            # we are updating
+                            existing_school.email = email
+                            existing_school.name = school_name
+                            existing_school.school_group = school_group
+                            existing_school.school_type = school_type
+                            existing_school.school_variant = school_variant
+                            existing_school.sibling_school = sibling_school
+                            existing_school.myschool_name = myschool_school_name
+                            existing_school.address = address
+                            existing_school.principal = principal
+                            existing_school.phone = phone
+                            existing_school.neighboring_groups = neighboring_groups
+                            existing_school.ministry_code = ministry_code
+                            existing_school.save()
+                        else:
+                            School.objects.create(
+                                email=email,
+                                name=school_name,
+                                school_group=school_group,
+                                school_type=school_type,
+                                school_variant=school_variant,
+                                sibling_school=sibling_school,
+                                myschool_name=myschool_school_name,
+                                address=address,
+                                principal=principal,
+                                phone=phone,
+                                neighboring_groups=neighboring_groups,
+                                ministry_code=ministry_code
+                            )
+
+                    reconnect_nv_users_to_schools()
             except:
                 messages.warning(request,
                                  "Κάτι πήγε λάθος... Μάλλον οι εγγραφές που μόλις φόρτωσες υπήρχαν ήδη στον πίνακα.")
