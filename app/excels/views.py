@@ -1144,7 +1144,7 @@ def reconnect_users_to_schools(user=None):
 
 
 def reconnect_nv_users_to_schools():
-    profiles = Profile.objects.filter(verified=False)  # type: list[Profile]
+    profiles = Profile.objects.all()  # type: list[Profile]
 
     for profile in profiles:
         try:
@@ -1152,7 +1152,7 @@ def reconnect_nv_users_to_schools():
 
             profile.user.last_name = school.name
             profile.user.save()
-
+            profile.school = school
             profile.verified = True
             profile.save()
         except School.DoesNotExist:
