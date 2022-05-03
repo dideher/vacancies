@@ -10,11 +10,6 @@ class SchoolType(models.TextChoices):
     EEEEK = 'EEEEK', _('Ειδικής Επαγγελματικής Εκπαίδευσης και Κατάρτισης')
 
 
-class SchoolTimetable(models.TextChoices):
-    ESPERINO = 'ESPERINO', _('Εσπερινό')
-    HMERISIO = 'HMERISIO', _('Ημερήσιο')
-
-
 class SchoolVariant(models.TextChoices):
     HMERISIO_GYM = 'HMERISIO_GYM', _('Ημερήσιο Γυμνάσιο')
     HMERISIO_LYK = 'HMERISIO_LYK', _('Ημερήσιο Γενικό Λύκειο')
@@ -40,21 +35,14 @@ class School(models.Model):
     principal = models.CharField(max_length=100, null=True, verbose_name='Διευθυντής Σχολείου')
     phone = models.CharField(max_length=15, null=True, verbose_name='Τηλέφωνο Σχολείου')
     address = models.CharField(max_length=100, null=True, verbose_name='Διεύθυνση Σχολείου')
-    sibling_school = models.ForeignKey('self', null=True, on_delete=models.SET_NULL, verbose_name='Συστεγαζόμενο Σχολείο')
+    sibling_school = models.ForeignKey('self', null=True, on_delete=models.SET_NULL,
+                                       verbose_name='Συστεγαζόμενο Σχολείο')
     school_type = models.CharField(
         max_length=16,
         verbose_name=_('Έιδος Σχολείου'),
         help_text=_('Επιλέξετε τον τύπο της σχολική μονάδας (Γυμνάσιο/Λύκειο/...)'),
         choices=SchoolType.choices,
         default=SchoolType.LYKEIO,
-        null=False
-    )
-    school_timetable = models.CharField(
-        max_length=16,
-        verbose_name=_('Ωράριο Λειτουργίας'),
-        help_text=_('Επιλέξετε τον το ωράριο λειτουργίας της σχολικής μονάδας'),
-        choices=SchoolTimetable.choices,
-        default=SchoolTimetable.HMERISIO,
         null=False
     )
     school_variant = models.CharField(
