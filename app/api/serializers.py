@@ -19,6 +19,7 @@ class SchoolSerializer(serializers.ModelSerializer):
     is_finalized = serializers.SerializerMethodField(read_only=True)
     finalized_on = serializers.SerializerMethodField(read_only=True)
     sibling_school = serializers.SerializerMethodField(read_only=True)
+    sibling_school_name = serializers.SerializerMethodField(read_only=True)
     school_group = serializers.SerializerMethodField(read_only=True)
     neighboring_groups = serializers.SerializerMethodField(read_only=True)
     neighboring_groups_label = serializers.SerializerMethodField(read_only=True)
@@ -33,6 +34,7 @@ class SchoolSerializer(serializers.ModelSerializer):
             'neighboring_groups',
             'neighboring_groups_label',
             'sibling_school',
+            'sibling_school_name',
             'principal',
             'phone',
             'address',
@@ -54,6 +56,15 @@ class SchoolSerializer(serializers.ModelSerializer):
             sibling_school: School = obj.sibling_school
             if sibling_school is not None:
                 return sibling_school.ministry_code
+            return None
+        except School.managed_by.RelatedObjectDoesNotExist:
+            return None
+
+    def get_sibling_school_name(self, obj: School) -> Union[str, None]:
+        try:
+            sibling_school: School = obj.sibling_school
+            if sibling_school is not None:
+                return sibling_school.name
             return None
         except School.managed_by.RelatedObjectDoesNotExist:
             return None
