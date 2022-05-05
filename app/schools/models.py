@@ -38,7 +38,7 @@ class School(models.Model):
     sibling_school = models.ForeignKey('self', null=True, on_delete=models.SET_NULL,
                                        verbose_name='Συστεγαζόμενο Σχολείο')
     school_type = models.CharField(
-        max_length=16,
+        max_length=32,
         verbose_name=_('Έιδος Σχολείου'),
         help_text=_('Επιλέξετε τον τύπο της σχολική μονάδας (Γυμνάσιο/Λύκειο/...)'),
         choices=SchoolType.choices,
