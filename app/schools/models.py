@@ -59,6 +59,18 @@ class School(models.Model):
                                      null=True,
                                      related_name='schools')
 
+    def get_school_variant_label(self):
+        try:
+            return SchoolVariant(self.school_variant).label if self.school_variant else None
+        except Exception:
+            return None
+
+    def get_school_type_label(self):
+        try:
+            return SchoolType(self.school_type).label if self.school_type else None
+        except Exception:
+            return None
+
     def __str__(self):
         return f'{self.name}'
 

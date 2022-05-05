@@ -23,6 +23,7 @@ class SchoolSerializer(serializers.ModelSerializer):
     school_group = serializers.SerializerMethodField(read_only=True)
     neighboring_groups = serializers.SerializerMethodField(read_only=True)
     neighboring_groups_label = serializers.SerializerMethodField(read_only=True)
+    school_type_label = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = School
@@ -39,6 +40,7 @@ class SchoolSerializer(serializers.ModelSerializer):
             'phone',
             'address',
             'school_type',
+            'school_type_label',
             'is_finalized',
             'finalized_on'
         ]
@@ -106,8 +108,13 @@ class SchoolSerializer(serializers.ModelSerializer):
         except School.managed_by.RelatedObjectDoesNotExist:
             return None
 
+    def get_school_type_label(self, obj: School) -> str:
+        return obj.get_school_type_label()
+
 
 class SchoolDetailSerializer(SchoolSerializer):
+
+    school_variant_label = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = School
@@ -123,10 +130,15 @@ class SchoolDetailSerializer(SchoolSerializer):
             'phone',
             'address',
             'school_type',
+            'school_type_label',
             'school_variant',
+            'school_variant_label',
             'is_finalized',
             'finalized_on'
         ]
+
+    def get_school_variant_label(self, obj: School) -> str:
+        return obj.get_school_variant_label()
 
 
 class EntrySerializer(serializers.ModelSerializer):
