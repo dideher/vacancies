@@ -46,7 +46,7 @@ class School(models.Model):
         null=False
     )
     school_variant = models.CharField(
-        max_length=28,
+        max_length=58,
         verbose_name=_('Κατηγορία'),
         help_text=_('Επιλέξετε την κατηγορία της σχολικής μονάδας'),
         choices=SchoolVariant.choices,
