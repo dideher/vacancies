@@ -20,7 +20,7 @@ from excel_response import ExcelResponse
 from .forms import UploadFileForm
 from vacancies.utils.permissions import check_user_is_superuser
 from main_app.models import Entry, Specialty, EntryVariantType
-from schools.models import School, SchoolGroup
+from schools.models import School, SchoolGroup, SchoolType, SchoolVariant
 from users.models import Profile
 from history.models import HistoryEntry
 from django.db import transaction
@@ -918,6 +918,11 @@ def get_or_create_sibling_school(school_ministry_code: str) -> School:
 @user_passes_test(check_user_is_superuser)
 @csrf_protect
 def add_schools(request):
+
+    # construct maps for easy Enum conversion
+    school_types_values = {choice[1]: SchoolType(choice[0]) for choice in SchoolType.choices}
+    school_variant_values = {choice[1]: SchoolVariant(choice[0]) for choice in SchoolVariant.choices}
+
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -951,8 +956,8 @@ def add_schools(request):
                         sibling_school_ministry_code = row[1]
                         school_group_number = row[2]
                         neighboring_groups = row[3]
-                        school_type = row[4]
-                        school_variant = row[5]
+                        school_type = school_types_values.get(row[4])
+                        school_variant = school_variant_values.get(row[5])
                         myschool_school_name = row[6]
                         school_name = row[7]
                         email = row[8]
@@ -967,7 +972,6 @@ def add_schools(request):
 
                         if school_group is not None:
                             # handle neighboring groups of group
-                            neighboring_groups_list = list()
                             group_tag = school_group.neighboring_tag
 
                             if len(neighboring_groups) > 0:
