@@ -133,11 +133,17 @@ class EntrySerializer(serializers.ModelSerializer):
 
     specialty_code = serializers.SerializerMethodField(read_only=True)
     specialty_text = serializers.SerializerMethodField(read_only=True)
+    school = serializers.SerializerMethodField(read_only=True)
     school_name = serializers.SerializerMethodField(read_only=True)
+    variant_label = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Entry
-        fields = ['id',  'school_name', 'hours', 'specialty_code', 'specialty_text', 'type', 'variant']
+        fields = ['id',  'school', 'school_name', 'hours', 'specialty_code', 'specialty_text', 'type', 'variant',
+                  'variant_label']
+
+    def get_school(self, obj: Entry) -> str:
+        return obj.school.ministry_code
 
     def get_school_name(self, obj: Entry) -> str:
         return obj.school.name
@@ -154,3 +160,6 @@ class EntrySerializer(serializers.ModelSerializer):
             specialty_text = obj.specialty.lectic
 
         return specialty_text
+
+    def get_variant_label(self, obj: Entry):
+        return obj.get_variant_label()
