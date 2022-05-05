@@ -175,3 +175,4 @@ class EntrySerializer(serializers.ModelSerializer):
 
     def get_variant_label(self, obj: Entry):
         return obj.get_variant_label()
+

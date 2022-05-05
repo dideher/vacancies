@@ -59,12 +59,11 @@ class SchoolPendingList(viewsets.ViewSetMixin, generics.ListAPIView):
 
 class EntryList(viewsets.ViewSetMixin, generics.ListAPIView):
     """
-    Returns a list of all entries
+    Returns a list of all entries (on schools that have finalized their data)
     """
-    queryset = Entry.objects.all()
+    queryset = Entry.objects.filter(school__managed_by__status=True)
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['variant', 'type', 'specialty']
     serializer_class = EntrySerializer
     permission_classes = [permissions.IsAuthenticated]
-
 
