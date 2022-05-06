@@ -114,7 +114,13 @@ class Entry(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['owner', 'specialty', 'variant'], name='unique_variant_entry')
         ]
-        
+
+    def get_variant_label(self):
+        try:
+            return EntryVariantType(self.variant).label if self.variant else None
+        except Exception:
+            return None
+
     def validate_unique(self, exclude=None):
         qs = self.__class__.objects.filter(specialty=self.specialty, variant=self.variant)
         if self.pk is None:

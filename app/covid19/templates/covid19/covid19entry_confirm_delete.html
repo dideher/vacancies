@@ -1,0 +1,43 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="card">
+
+        <div class="card-body">
+            <h5 class="card-title">Διαγραφή Καταχώρισης Κενού COVID-19</h5>
+            <p class="card-text">Θέλετε σίγουρα να διαγράψετε το παρακάτω κενό COVID-19 ; </p>
+
+            <table class="table table-sm">
+                <thead class="thead-light">
+                <tr>
+                    <th scope="col">Α.Μ.</th>
+                    <th scope="col">Επώνυμο</th>
+                    <th scope="col">Όνομα</th>
+                    <th scope="col">Ειδικότητα</th>
+                    <th scope="col">Ώρες</th>
+                    <th scope="col">Ημ/νια Νόσησης</th>
+                    <th scope="col">Ημ/νια Πιθανής Επιστροφής</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ object.teacher_registry }}</td>
+                    <td> {{ object.teacher_surname }}</td>
+                    <td> {{ object.teacher_name }}</td>
+                    <td> {{ object.specialty.code }} - {{ object.specialty.lectic }}</td>
+                    <td> {{ object.hours }}</td>
+                    <td> {{ object.illness_started|date:"d M Y" }}</td>
+                    <td> {{ object.illness_end_estimation|date:"d M Y" }}</td>
+                </tr>
+
+                </tbody>
+            </table>
+
+            <button class="btn btn-outline-danger" type="submit">Ναι, διαγραφή</button>
+            <a class="btn btn-outline-secondary" href="{% url 'covid19:covid19_entries' %}">Επιστροφή</a>
+
+        </div>
+    </div>
+</form>
+{% endblock content %}

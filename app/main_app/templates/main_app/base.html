@@ -20,6 +20,19 @@
     {% endif %}
 </head>
 <body>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
 <header class="site-header">
     <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
@@ -48,9 +61,11 @@
         </div>
     </nav>
 </header>
-<main role="main" class="container">
+
+
+<div role="main" class="container-fluid">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-9 mx-auto">
             {% if messages %}
                 {% for message in messages %}
                     {% if message.tags != 'error' %}
@@ -69,9 +84,10 @@
             {% endif %}
             {% block content %}{% endblock %}
         </div>
+
         {% if user.is_authenticated %}
             {% if user.is_superuser %}
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <ul class="list-group">
                         <!-- <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="/admin/">Διαχείριση Βάσης</a>
@@ -86,10 +102,7 @@
                             <a class="sidebar-item" href="{% url 'history:clear_history' %}">Διαγραφή Ιστορικού Καταχωρίσεων</a>
                         </li>
                         <li class="list-group-item list-group-item-light sidebar">
-                             <span class="sidebar-item">Σχολικές μονάδες [ <a class="sidebar-item"
-                                                                              href="{% url 'excels:upload_schools' %}">Εισαγωγή</a> |
-                                 <a class="sidebar-item"
-                                    href="{% url 'excels:add_schools' %}">Προσθήκη</a> ] </span>
+                             <a class="sidebar-item" href="{% url 'excels:add_schools' %}">Ενημέρωση Σχολικών Μονάδων</a>
                         </li>
                         <li class="list-group-item list-group-item-light sidebar">
                              <a class="sidebar-item" href="{% url 'excels:add_specialties' %}">Ενημέρωση Ειδικοτήτων</a>
@@ -121,6 +134,9 @@
                                 <a class="sidebar-item" href="{% url 'pdfs:pdf_entries' %}">pdf</a> ]
                             </span>
                         </li>
+<!--                        <li class="list-group-item list-group-item-light sidebar">-->
+<!--                            <a class="sidebar-item" href="{% url 'covid19:covid19_export_entries_xls' %}">Εξαγωγή καταχωρίσεων <strong>COVID-19</strong> κενών</a>-->
+<!--                        </li>-->
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'schools:check_schools' %}">Έλεγχος Χρηστών-Σχολικών
                                 μονάδων</a>
@@ -140,7 +156,17 @@
                     </ul>
                 </div>
             {% else %}
-                <div class="col-md-4">
+                <div class="col-md-3">
+
+<!--                    <ul class="list-group mb-2">-->
+<!--                        <li class="list-group-item list-group-item-light sidebar">-->
+<!--                            <a class="sidebar-item" href="{% url 'covid19:covid19_entries' %}">-->
+<!--                                <i class="bi bi-shield-exclamation"></i>-->
+<!--                                <strong>Διαχείριση Κενών COVID-19</strong>-->
+<!--                            </a>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+
                     <ul class="list-group">
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'users:info' %}">Πληροφορίες για το Σχολείο</a>
@@ -173,23 +199,16 @@
                             <a class="sidebar-item" href="{% url 'main_app:about' %}">Σχετικά με την εφαρμογή</a>
                         </li>
                     </ul>
+
+
+
                 </div>
             {% endif %}
         {% endif %}
         {% block content-section %}{% endblock %}
     </div>
-</main>
+</div>
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
+
 </body>
 </html>

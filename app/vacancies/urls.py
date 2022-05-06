@@ -21,6 +21,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/', include('api.urls')),
     path('maskeparty/', include('impersonate.urls')),
     path('', include('main_app.urls')),
     path('', include('history.urls')),
@@ -28,6 +29,7 @@ urlpatterns = [
     path('', include('schools.urls')),
     path('', include('excels.urls')),
     path('', include('pdfs.urls')),
+    path('covid19', include('covid19.urls')),
     path('password-reset/', auth_views.PasswordResetView.as_view(template_name='users/password_reset.html'),
          name='password_reset'),
     path('password-reset/done/',
