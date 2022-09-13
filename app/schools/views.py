@@ -22,7 +22,7 @@ class SchoolsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = School
     template_name = 'schools/schools.html'
     context_object_name = 'schools'
-    ordering = ['id']
+    ordering = ['name']
     paginate_by = 10
 
     def test_func(self):
