@@ -8,11 +8,28 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic import ListView, DetailView
 from .models import School
 from users.models import Profile
+from main_app.models import Entry
 from vacancies.utils.permissions import check_user_is_superuser
 
 
 class SchoolDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = School
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.object is not None:
+            current_school: School = self.object
+
+            try:
+                managed_by: Profile = current_school.managed_by
+                data['is_finalized'] = managed_by.status is True
+                data['finalized_on'] = managed_by.status_time
+            except School.managed_by.RelatedObjectDoesNotExist:
+                data['is_finalized'] = False
+                data['finalized_on'] = None
+
+            data['school_entries'] = Entry.objects.filter(school=current_school).order_by('specialty')
+        return data
 
     def test_func(self):
         return check_user_is_superuser(self.request.user)
@@ -63,14 +80,15 @@ def status_update(request):
 @user_passes_test(check_user_is_superuser)
 def check_status(request):
 
-    superusers = User.objects.filter(is_superuser=True)
-    p_status_true = Profile.objects.filter(status=True).exclude(user__in=superusers)
-    u_status_false = User.objects.filter(profile__status=False).exclude(pk__in=superusers).exclude(profile__verified=False)
-    s_status_false = School.objects.filter(email__in=[u.email for u in u_status_false])
-    # u_status_true = User.objects.filter(profile__status=True).exclude(pk__in=superusers).exclude(profile__verified=False)
-    # s_status_true = School.objects.filter(email__in=[u.email for u in u_status_true])
+    # superusers = User.objects.filter(is_superuser=True)
+    # p_status_true = Profile.objects.filter(status=True).exclude(user__in=superusers)
+    # u_status_false = User.objects.filter(profile__status=False).exclude(pk__in=superusers).exclude(profile__verified=False)
+    # s_status_false = School.objects.filter(email__in=[u.email for u in u_status_false])
+    # s_status_false = School.objects.filter(email__in=[u.email for u in u_status_false])
+    s_status_true = School.objects.filter(managed_by__status=True).order_by('-managed_by__status_time')
+    s_status_false = School.objects.filter(managed_by__status=False).order_by('name')
 
-    return render(request, 'schools/check_status.html', {'p_status_true': p_status_true,
+    return render(request, 'schools/check_status.html', {'s_status_true': s_status_true,
                                                          's_status_false': s_status_false,
                                                          })
 
