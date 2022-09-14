@@ -15,7 +15,7 @@ class Profile(models.Model):
     )
     verified = models.BooleanField(default=False, verbose_name='Επαληθεύτηκε από τη ΔΔΕ')
     status = models.BooleanField(default=False, verbose_name='Έκανε επικαιροποίηση')
-    status_time = models.DateTimeField(default=False, null=True, verbose_name='Χρονική σήμανση επικαιροποίησης')
+    status_time = models.DateTimeField(default=None, null=True, verbose_name='Χρονική σήμανση επικαιροποίησης')
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -36,7 +36,6 @@ def create_profile(sender, instance, created, *args, **kwargs):
     """
     if created:
         new_profile = Profile.objects.create(user=instance)  # type: Profile
-
         school = School.objects.filter(email=instance.email).first()  # type: School
 
         if school is not None:

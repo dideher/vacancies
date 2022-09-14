@@ -1,9 +1,14 @@
 {% extends "main_app/base.html" %}
 {% block content %}
     <div class="content-section">
-        <h3>Πληροφορίες για το Σχολείο</h3>
-
-        <table class="table">
+        <h3>Πληροφορίες για το "{{ school.name }}"</h3>
+        <br />
+        {% if is_finalized %}
+            <div class="alert alert-success">Η σχολική μονάδα έχει επικαιροποιήσει επιτυχώς στις {{ finalized_on|date:'Y-m-d@H:i' }}</div>
+        {% else %}
+            <div class="alert alert-danger">H σχολική μονάδα ΔΕΝ έχει επικαιροποιήσει τα κενά/πλεονάσματα της</div>
+        {% endif %}
+        <table class="table table-sm">
             <tbody>
             <tr>
                 <td style="width: 40%">Κωδικός Υπουργείου</td>
@@ -41,5 +46,37 @@
             </tr>
             </tbody>
         </table>
+
+        <br />
+        <br />
+        <h5>Τρέχουσες Καταχωρίσεις</h5>
+        <br />
+        <table class="table table-hover table-sm">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Ειδικότητα</th>
+                    <th scope="col">Τύπος Κατ.</th>
+                    <th scope="col">Είδος</th>
+                    <th scope="col">Ώρες</th>
+                    <th scope="col">Παρατηρήσεις</th>
+                    <th scope="col">Ημ/νια Καταχ.</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for entry in school_entries %}
+                <tr>
+                    <td> {{ entry.specialty.code }} </td>
+                    <td>{{ entry.type }}</td>
+                    <td>{{ entry.get_variant_display }}</td>
+                    <td> {{ entry.hours }} </td>
+                    <td data-toggle="tooltip" data-placement="left" title="{{entry.description|default:''}}">
+                        {{ entry.description|default:'-'|truncatechars:10 }}
+                    </td>
+                    <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+    </table>
+
     </div>
 {% endblock content %}

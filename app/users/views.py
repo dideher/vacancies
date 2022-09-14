@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from .forms import UserRegisterForm
 from django.contrib.auth.views import LoginView
 from .forms import UserAuthenticationForm
 
 
+@transaction.atomic
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
