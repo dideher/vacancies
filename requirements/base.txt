@@ -16,3 +16,4 @@ djangorestframework==3.12.4
 django-impersonate
 sortedcontainers
 django-filter
+tabulate
