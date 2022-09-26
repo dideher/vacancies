@@ -7,7 +7,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 # Email settings
 DEFAULT_FROM_EMAIL = 'no-reply@dideira.gr'
-EMAIL_SUBJECT_PREFIX = '[kena_staging] '
+EMAIL_SUBJECT_PREFIX = '[kena] '
 
 
 # Database
