@@ -71,10 +71,13 @@ def check_schools(request):
 def status_update(request):
     if request.method == 'POST':
 
+
         user: User = request.user
         profile: Profile = user.profile
-
         school: School = profile.school
+
+        logging.info("school '%s' is trying to confirm data", school)
+
         profile.status = True
         profile.status_time = timezone.now()
         profile.save()
@@ -83,6 +86,9 @@ def status_update(request):
 
             user_model_class = get_user_model()
             users = user_model_class.objects.filter(is_superuser=True)
+
+            recipient_list = [user.email for user in users]
+            logging.info("we will also notify via email the following users : %s", recipient_list)
 
             entries = Entry.objects.filter(school=school).order_by('specialty')
             headers = ['Ειδικότητα', 'Τύπος', 'Είδος', 'Ώρες']
@@ -101,12 +107,12 @@ def status_update(request):
                 subject=subject,
                 message=message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                fail_silently=True,
-                recipient_list=[user.email for user in users]
+                fail_silently=False,
+                recipient_list=recipient_list
             )
 
         except Exception as e:
-            logging.error("failed to send email due to '%s'", str(e))
+            logging.error("failed to notify users via email due to '%s'", str(e))
 
         return redirect('users:info')
     else:
