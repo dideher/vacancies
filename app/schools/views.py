@@ -1,14 +1,20 @@
 import datetime
-
+import logging
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.core.mail import BadHeaderError, send_mail, send_mass_mail
+from django.conf import settings
+from tabulate import tabulate
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic import ListView, DetailView
 from .models import School
-from users.models import Profile
-from main_app.models import Entry
+from users.models import Profile, User
+from main_app.models import Entry, EntryVariantType
+
 from vacancies.utils.permissions import check_user_is_superuser
 
 
@@ -64,9 +70,51 @@ def check_schools(request):
 @login_required
 def status_update(request):
     if request.method == 'POST':
-        request.user.profile.status = True
-        request.user.profile.status_time = timezone.now()
-        request.user.profile.save()
+
+        user: User = request.user
+        profile: Profile = user.profile
+        school: School = profile.school
+        utc_now = timezone.now()
+        logging.info("school '%s' is trying to confirm data", school)
+
+        profile.status = True
+        profile.status_time = utc_now
+        profile.save()
+
+        try:
+
+            user_model_class = get_user_model()
+            users = user_model_class.objects.filter(is_superuser=True)
+
+            recipient_list = [user.email for user in users]
+            logging.info("we will also notify via email the following users : %s", recipient_list)
+
+            entries = Entry.objects.filter(school=school).order_by('specialty')
+            headers = ['Ειδικότητα', 'Τύπος', 'Είδος', 'Ώρες']
+            values = [(f'{entry.specialty.code} - {entry.specialty.lectic}', entry.type,
+                       str(EntryVariantType(entry.variant).label), entry.hours) for entry in entries]
+
+            entries_table = tabulate(tabular_data=values, headers=headers, tablefmt='simple_grid')
+            status_time_localized = date_format(profile.status_time, format='SHORT_DATETIME_FORMAT', use_l10n=True)
+            subject = f'{settings.EMAIL_SUBJECT_PREFIX}- Επικαιροποίηση Σχολικής Μονάδας \'{school.name}\''
+            message = f'Σας ενημερώνουμε πως η σχολική μονάδα \'{school.name}\' επικαιροποιήθηκε επιτυχώς απο ' \
+                      f'τον χρήστη \'{user.username}\' ως προς τα κενά και τα πλεονάσματά της στις ' \
+                      f'\'{status_time_localized}\'.\n\n Τα επικαιροποιημένα στοιχεία κενών/πλεονασμάτων της μονάδας ' \
+                      f'είναι τα παρακάτω :\n\n' + entries_table + f'\n\n\nΗ ειδοποίηση είναι μια αυτοματοποίηση ' \
+                                                                   'του τμήματος Δ\' της ΔΔΕ Ηρακλείου'
+
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                fail_silently=False,
+                recipient_list=recipient_list
+            )
+
+        except Exception as e:
+            logging.error("failed to notify users via email due to '%s'", str(e))
+
+        logging.info("school '%s' successfully confirmed data on '%s'", school, utc_now)
 
         return redirect('users:info')
     else:
