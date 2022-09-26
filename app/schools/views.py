@@ -103,13 +103,14 @@ def status_update(request):
                       f'είναι τα παρακάτω :\n\n' + entries_table + f'\n\n\nΗ ειδοποίηση είναι μια αυτοματοποίηση ' \
                                                                    'του τμήματος Δ\' της ΔΔΕ Ηρακλείου'
 
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                fail_silently=False,
-                recipient_list=recipient_list
-            )
+            for recipient in recipient_list:
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    fail_silently=True,
+                    recipient_list=(recipient, )
+                )
 
         except Exception as e:
             logging.error("failed to notify users via email due to '%s'", str(e))
