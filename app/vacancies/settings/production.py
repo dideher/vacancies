@@ -6,7 +6,6 @@ DEBUG = False
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # Email settings
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = 'no-reply@dideira.gr'
 EMAIL_SUBJECT_PREFIX = '[kena] '
 

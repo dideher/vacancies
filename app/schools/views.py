@@ -71,15 +71,14 @@ def check_schools(request):
 def status_update(request):
     if request.method == 'POST':
 
-
         user: User = request.user
         profile: Profile = user.profile
         school: School = profile.school
-
+        utc_now = timezone.now()
         logging.info("school '%s' is trying to confirm data", school)
 
         profile.status = True
-        profile.status_time = timezone.now()
+        profile.status_time = utc_now
         profile.save()
 
         try:
@@ -113,6 +112,8 @@ def status_update(request):
 
         except Exception as e:
             logging.error("failed to notify users via email due to '%s'", str(e))
+
+        logging.info("school '%s' successfully confirmed data on '%s'", school, utc_now)
 
         return redirect('users:info')
     else:
