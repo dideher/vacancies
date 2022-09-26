@@ -96,11 +96,12 @@ def status_update(request):
 
             entries_table = tabulate(tabular_data=values, headers=headers, tablefmt='simple_grid')
             status_time_localized = date_format(profile.status_time, format='SHORT_DATETIME_FORMAT', use_l10n=True)
-            subject = f'{settings.EMAIL_SUBJECT_PREFIX}- Επικαιροποίηση Σχολικής Μονάδας \'{school.name}\'',
+            subject = f'{settings.EMAIL_SUBJECT_PREFIX}- Επικαιροποίηση Σχολικής Μονάδας \'{school.name}\''
             message = f'Σας ενημερώνουμε πως η σχολική μονάδα \'{school.name}\' επικαιροποιήθηκε επιτυχώς απο ' \
                       f'τον χρήστη \'{user.username}\' ως προς τα κενά και τα πλεονάσματά της στις ' \
-                      f'\'{status_time_localized}\'. Τα επικαιροποιημένα στοιχεία κενών/πλεονασμάτων της μονάδας ' \
-                      f'είναι τα παρακάτω :\n\n' + entries_table + "\n\n"
+                      f'\'{status_time_localized}\'.\n\n Τα επικαιροποιημένα στοιχεία κενών/πλεονασμάτων της μονάδας ' \
+                      f'είναι τα παρακάτω :\n\n' + entries_table + f'\n\n\nΗ ειδοποίηση είναι μια αυτοματοποίηση ' \
+                                                                   'του τμήματος Δ\' της ΔΔΕ Ηρακλείου'
 
             send_mail(
                 subject=subject,
