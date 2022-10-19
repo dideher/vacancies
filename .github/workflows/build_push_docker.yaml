@@ -3,13 +3,13 @@ name: "Docker Image Build & Push"
 on:
   push:
     branches:
-      - master
+      - main
       - next
     tags:
       - 'v*'
   pull_request:
     branches:
-      - 'master'
+      - 'main'
       - 'next'
 
 jobs:
