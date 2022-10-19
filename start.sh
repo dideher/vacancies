@@ -12,5 +12,5 @@ else
 fi
 
 # Start Gunicorn
-exec gunicorn -k egg:meinheld#gunicorn_worker -c "$GUNICORN_CONF" "$APP_MODULE"
-
+gunicorn -c "$GUNICORN_CONF" "$APP_MODULE" &
+nginx -g "daemon off;"
