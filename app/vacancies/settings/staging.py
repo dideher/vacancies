@@ -20,9 +20,10 @@ DATABASES = {
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'PORT': os.getenv('DB_PORT', 3306),
         'OPTIONS': {
-            'init_command': 'SET default_storage_engine=INNODB',
+            'init_command': "SET default_storage_engine=INNODB; SET sql_mode='STRICT_TRANS_TABLES'",
+            'isolation_level': 'read committed',
         }
     }
 }

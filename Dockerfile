@@ -11,7 +11,9 @@ RUN set -x \
         jpeg-dev \
         zlib-dev \
         libjpeg  \
-        mariadb-dev
+        musl-dev \
+        mariadb-connector-c-dev
+        #mariadb-dev
         #mariadb-client
         #postgresql-dev
 
@@ -58,20 +60,24 @@ RUN set -x \
 ## copy Python dependencies from build image
 COPY --from=compile-image /opt/venv /opt/venv
 
+COPY ./app /app
+
 ## prepare nginx
-COPY nginx.conf /etc/nginx/http.d/default.conf
+COPY docker-files/nginx.conf /etc/nginx/http.d/default.conf
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
-COPY ./entrypoint.sh /entrypoint.sh
+COPY docker-files/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-COPY ./start.sh /start.sh
+COPY docker-files/start.sh /start.sh
 RUN chmod +x /start.sh
 
-COPY ./gunicorn_conf.py /gunicorn_conf.py
+COPY docker-files/prestart.sh /prestart.sh
+RUN chmod +x /prestart.sh
 
-COPY ./app /app
+COPY docker-files/gunicorn_conf.py /gunicorn_conf.py
+
 WORKDIR /app/
 
 

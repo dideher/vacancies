@@ -17,8 +17,16 @@ ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '192.168.1.4', '192.168.2.
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('DB_NAME', 'db_vacancies'),
+        'USER': os.getenv('DB_USER', 'vacancies_user'),
+        'PASSWORD': os.getenv('DB_PASS', 'vacancies_pass'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', 3306),
+        'OPTIONS': {
+            'init_command': "SET default_storage_engine=INNODB; SET sql_mode='STRICT_TRANS_TABLES'",
+            'isolation_level': 'read committed',
+        }
     }
 }
 
