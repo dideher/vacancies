@@ -3,6 +3,7 @@ from vacancies.settings.common import *
 
 DEBUG = True
 
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', 'kena-new.dideira.gr', 'kena-next.dideira.gr']
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # Email settings
