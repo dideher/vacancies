@@ -69,7 +69,7 @@ mysql> create database vacancies_db character set utf8;
 and finally, create the db user
 
 ```sql
-CREATE USER 'vacancies_user'@'%' IDENTIFIED WITH mysql_native_password BY 'XXXXXXXXXX';
+CREATE USER 'vacancies_user'@'%' IDENTIFIED BY 'XXXXXXXXXX';
 GRANT ALL PRIVILEGES ON vacancies_db.* TO 'vacancies_user'@'%';
 flush privileges;
 ```
@@ -110,6 +110,10 @@ docker build . -t dideira/vacancies-web:latest
 
 ```commandline
 docker run --rm -it --name vacancies \
+    -e ENVIRONMENT=staging \
+    -e WEB_CONCURRENCY=4 \
+    -e CODE_RELOAD=true \
+    -e MAX_REQUESTS=100 \
     -e DJANGO_SETTINGS_MODULE=vacancies.settings.staging \
     -e DB_NAME=vacancies_db \
     -e DB_USER=vacancies \
