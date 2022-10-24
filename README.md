@@ -1,10 +1,21 @@
+# Development
+
+### Conda Notes
+
+If you are running a virtual based on conda then after installing
+requirements, do the following :
+
+```bash
+$ conda install -c anaconda mysqlclient
+```
+
 # Deployment
 
 ## Database
 
 
-Make sure you have a running MySQL database. If not you could 
-spawn one with docker like :
+Make sure you have a running MySQL database. If you don't then
+you can spawn a docker container with the following :
 
 Create a docker volume :
 ```commandline

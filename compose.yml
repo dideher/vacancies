@@ -1,0 +1,118 @@
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    command: "--default-authentication-plugin=mysql_native_password"
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_vacancies
+      MYSQL_USER: vacancies_user
+      MYSQL_PASSWORD: vacancies_pass
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - back-tier
+  web:
+    build: .
+    restart: always
+    environment:
+      DJANGO_SETTINGS_MODULE: vacancies.settings.docker-dev
+      DB_HOST: db
+      DB_NAME: db_vacancies
+      DB_USER: vacancies_user
+      DB_PASS: vacancies_pass
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:80"
+    networks:
+      - front-tier
+      - back-tier
+
+volumes:
+  db-data: {}
+
+networks:
+  front-tier: {}
+  back-tier: {}
+#  web:
+#    build:
+#      context: .
+#      dockerfile: docker-images/web/Dockerfile
+#    volumes:
+#      - type: volume
+#        source: static_volume
+#        target: /usr/share/nginx/html/static
+#        read_only: true
+#    networks:
+#      - frontend
+#      - backend
+#    expose:
+#      - "80"
+#    ports:
+#      - 8888:80
+#    depends_on:
+#      - app
+#  app:
+#    build:
+#      context: .
+#      dockerfile: docker-images/app/Dockerfile
+#    # volumes:
+#    #   - static_data:/vol/web
+#    environment:
+#      MYSQL_DATABASE: 'vacancies_db'
+#      MYSQL_USER: 'user'
+#      MYSQL_PASSWORD: 'password'
+#      MYSQL_ROOT_PASSWORD: 'admin'
+#      SECRET_KEY: "some-secret-key"
+#      DJANGO_SETTINGS_MODULE: 'vacancies.settings.production'
+#    env_file: .env
+#    volumes:
+#      - type: volume
+#        source: static_volume
+#        target: /app/static_files
+#    networks:
+#      - backend
+#    expose:
+#      - "80"
+#    depends_on:
+#      - db
+#  db:
+#    image: mariadb:10.5
+#    restart: always
+#    command: ['--character-set-server=utf8', '--collation-server=utf8_unicode_ci']
+#    networks:
+#      - backend
+#    environment:
+#      MYSQL_DATABASE: 'vacancies_db'
+#      MYSQL_USER: 'user'
+#      MYSQL_PASSWORD: 'password'
+#      MYSQL_ROOT_PASSWORD: 'admin'
+#    volumes:
+#      - type: volume
+#        source: db_volume
+#        target: /var/lib/mysql
+#  #nginx:
+#  #   build:
+#  #     context: ./_docker/nginx
+#  #   volumes:
+#  #     - static_data:/vol/static
+#  #   ports:
+#  #     - 8001:8080
+#  #   depends_on:
+#  #     - vacancies
+#
+#volumes:
+#  static_volume:
+#  db_volume:
+#
+#networks:
+#  frontend:
+#  backend:
