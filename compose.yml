@@ -22,11 +22,16 @@ services:
     build: .
     restart: always
     environment:
+      ENVIRONMENT: dev
+      WEB_CONCURRENCY: 1
+      CODE_RELOAD: true
       DJANGO_SETTINGS_MODULE: vacancies.settings.docker-dev
       DB_HOST: db
       DB_NAME: db_vacancies
       DB_USER: vacancies_user
       DB_PASS: vacancies_pass
+    volumes:
+      - ./app:/app
     depends_on:
       db:
         condition: service_healthy

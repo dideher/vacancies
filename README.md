@@ -9,6 +9,24 @@ requirements, do the following :
 $ conda install -c anaconda mysqlclient
 ```
 
+For development a `compose.yml` is offered which covers everything, ie 
+a `web` and a `db` component. To bring up the environment simply run :
+
+```bash
+$ docker compose up
+```
+
+## Migrations
+
+To create django migrations, you need to run the `makemigrations` command
+in the `web` container. One simple way to do this :
+
+```bash
+$ docker compose exec web python manage.py makemigrations
+$ docker compose exec web python manage.py migrate
+```
+
+
 # Deployment
 
 ## Database
@@ -52,6 +70,7 @@ flush privileges;
 
 | Variable               | Description                                  | Example                                                                                             |
 |------------------------|----------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| ENVIRONMENT            | The active environment                       | DEV                                                                                                 |
 | DATABASE_URL           | The database to connect to (LEGACY)          | postgres://username:password@ec2-34-247-118-233.eu-west-1.compute.amazonaws.com:5432/d8feahfemc1tmm |
 | DB_HOST                | The database host to connect to              | localhost                                                                                           |
 | DB_PORT                | The database port to connect to              | 3306                                                                                                |
