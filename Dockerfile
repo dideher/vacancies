@@ -73,8 +73,8 @@ RUN chmod +x /entrypoint.sh
 COPY docker-files/start.sh /start.sh
 RUN chmod +x /start.sh
 
-COPY docker-files/prestart.sh /app/prestart.sh
-RUN chmod +x /app/prestart.sh
+COPY docker-files/prestart.sh /prestart.sh
+RUN chmod +x /prestart.sh
 
 COPY docker-files/gunicorn_conf.py /gunicorn_conf.py
 

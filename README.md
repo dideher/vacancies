@@ -26,6 +26,13 @@ $ docker compose exec web python manage.py makemigrations
 $ docker compose exec web python manage.py migrate
 ```
 
+## Superuser
+
+If you need to create a superuser :
+
+```bash
+$ docker compose exec web python manage.py createsuperuser
+```
 
 # Deployment
 
