@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'schools',
     'excels',
     'pdfs',
-    'covid19',
 ]
 
 MIDDLEWARE = [
