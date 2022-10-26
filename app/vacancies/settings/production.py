@@ -9,8 +9,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEFAULT_FROM_EMAIL = 'no-reply@dideira.gr'
 EMAIL_SUBJECT_PREFIX = '[kena] '
 
-# SECURITY WARNING: update this when you have the production host
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', 'kena.dideira.gr']
 
 
 # Database
@@ -19,13 +18,14 @@ ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vacancies_db',
-        'USER': 'user',
-        'PASSWORD': 'password',
-        'HOST': 'db',
-        'PORT': '3306',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT', 3306),
         'OPTIONS': {
-            'init_command': 'SET default_storage_engine=INNODB',
+            'init_command': "SET default_storage_engine=INNODB; SET sql_mode='STRICT_TRANS_TABLES'",
+            'isolation_level': 'read committed',
         }
     }
 }
