@@ -170,3 +170,17 @@ Don't forget to add the nginx-proxy container to the `vacancies-net` network
 ```commandline
 docker network connect vacancies-net nginx-proxy
 ```
+
+# Django Load & Dump data
+
+Export (dump) data, for example (from heroku) :
+
+```bash
+heroku run --app vacancies-dide-next -- python /app/app/manage.py dumpdata --indent 2 --natural-foreign --natural-primary --exclude auth.permission --exclude contenttypes > kena-next.json
+```
+
+and then to import (load) data run :
+
+```bash
+ cat kena-next.json | docker compose exec -T web python manage.py loaddata --format json -
+ ```
