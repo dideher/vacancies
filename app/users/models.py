@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from schools.models import School
+from vacancies.utils import disable_for_loaddata
 
 
 class Profile(models.Model):
@@ -21,6 +22,7 @@ class Profile(models.Model):
         return f'{self.user.username} Profile'
 
 
+@disable_for_loaddata
 def create_profile(sender, instance, created, *args, **kwargs):
     """
     Create a new profile and associate it with a school based on the
@@ -50,6 +52,7 @@ def create_profile(sender, instance, created, *args, **kwargs):
 post_save.connect(create_profile, sender=User)
 
 
+@disable_for_loaddata
 def save_profile(sender, instance, *args, **kwargs):
     instance.profile.save()
 
