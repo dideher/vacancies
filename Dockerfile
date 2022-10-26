@@ -54,6 +54,7 @@ RUN set -x \
         openssl \
         ca-certificates \
         mariadb-connector-c \
+        mariadb-client \
         nginx \
         vim
 
