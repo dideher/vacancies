@@ -9,7 +9,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEFAULT_FROM_EMAIL = 'no-reply@dideira.gr'
 EMAIL_SUBJECT_PREFIX = '[kena] '
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', 'kena.dideira.gr']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', 'kena.dideira.gr', 'kena-master.dideira.gr']
 
 
 # Database
