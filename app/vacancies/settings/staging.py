@@ -1,15 +1,14 @@
 import os
 from vacancies.settings.common import *
 
-DEBUG = False
+DEBUG = True
 
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', 'kena-new.dideira.gr', 'kena-next.dideira.gr']
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # Email settings
-DEFAULT_FROM_EMAIL = 'no-reply@dideira.gr'
-EMAIL_SUBJECT_PREFIX = '[kena] '
-
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', 'kena.dideira.gr']
+DEFAULT_FROM_EMAIL = 'no-reply-staging@dideira.gr'
+EMAIL_SUBJECT_PREFIX = '[kena_staging] '
 
 
 # Database
@@ -30,6 +29,10 @@ DATABASES = {
     }
 }
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+STATIC_ROOT = '/app/static_files'
+MEDIA_ROOT = '/app/media_files'
 
 # Sentry Settings
 try:
@@ -47,10 +50,5 @@ try:
         send_default_pii=True
     )
 except ImportError:
-    # probably dependencies not installed
+    # probably dependecies not installed
     pass
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-STATIC_ROOT = '/app/static_files'
-MEDIA_ROOT = '/app/media_files'
