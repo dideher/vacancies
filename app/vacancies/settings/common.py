@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters',
+    'constance',
     'impersonate',
     'crispy_forms',
     'rest_framework',
@@ -154,3 +155,10 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+from collections import OrderedDict
+
+CONSTANCE_CONFIG = OrderedDict([
+    ('SEND_FINALIZATION_EMAILS',  (True, 'If set to True finalization email notifications will be sent')),
+])
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
