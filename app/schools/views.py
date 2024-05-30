@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.mail import BadHeaderError, send_mail, send_mass_mail
 from django.conf import settings
 from tabulate import tabulate
+from constance import config
 from django.utils import timezone
 from django.utils.formats import date_format
 from django.shortcuts import render, redirect
@@ -80,40 +81,42 @@ def status_update(request):
         profile.status = True
         profile.status_time = utc_now
         profile.save()
+        if config.SEND_FINALIZATION_EMAILS is True:
+            try:
 
-        try:
+                user_model_class = get_user_model()
+                users = user_model_class.objects.filter(is_superuser=True)
 
-            user_model_class = get_user_model()
-            users = user_model_class.objects.filter(is_superuser=True)
+                recipient_list = [user.email for user in users]
+                logging.info("we will also notify via email the following users : %s", recipient_list)
 
-            recipient_list = [user.email for user in users]
-            logging.info("we will also notify via email the following users : %s", recipient_list)
+                entries = Entry.objects.filter(school=school).order_by('specialty')
+                headers = ['Ειδικότητα', 'Τύπος', 'Είδος', 'Ώρες']
+                values = [(f'{entry.specialty.code} - {entry.specialty.lectic}', entry.type,
+                           str(EntryVariantType(entry.variant).label), entry.hours) for entry in entries]
 
-            entries = Entry.objects.filter(school=school).order_by('specialty')
-            headers = ['Ειδικότητα', 'Τύπος', 'Είδος', 'Ώρες']
-            values = [(f'{entry.specialty.code} - {entry.specialty.lectic}', entry.type,
-                       str(EntryVariantType(entry.variant).label), entry.hours) for entry in entries]
+                entries_table = tabulate(tabular_data=values, headers=headers, tablefmt='simple_grid')
+                status_time_localized = date_format(profile.status_time, format='SHORT_DATETIME_FORMAT', use_l10n=True)
+                subject = f'{settings.EMAIL_SUBJECT_PREFIX}- Επικαιροποίηση Σχολικής Μονάδας \'{school.name}\''
+                message = f'Σας ενημερώνουμε πως η σχολική μονάδα \'{school.name}\' επικαιροποιήθηκε επιτυχώς απο ' \
+                          f'τον χρήστη \'{user.username}\' ως προς τα κενά και τα πλεονάσματά της στις ' \
+                          f'\'{status_time_localized}\'.\n\n Τα επικαιροποιημένα στοιχεία κενών/πλεονασμάτων της μονάδας ' \
+                          f'είναι τα παρακάτω :\n\n' + entries_table + f'\n\n\nΗ ειδοποίηση είναι μια αυτοματοποίηση ' \
+                                                                       'του τμήματος Δ\' της ΔΔΕ Ηρακλείου'
 
-            entries_table = tabulate(tabular_data=values, headers=headers, tablefmt='simple_grid')
-            status_time_localized = date_format(profile.status_time, format='SHORT_DATETIME_FORMAT', use_l10n=True)
-            subject = f'{settings.EMAIL_SUBJECT_PREFIX}- Επικαιροποίηση Σχολικής Μονάδας \'{school.name}\''
-            message = f'Σας ενημερώνουμε πως η σχολική μονάδα \'{school.name}\' επικαιροποιήθηκε επιτυχώς απο ' \
-                      f'τον χρήστη \'{user.username}\' ως προς τα κενά και τα πλεονάσματά της στις ' \
-                      f'\'{status_time_localized}\'.\n\n Τα επικαιροποιημένα στοιχεία κενών/πλεονασμάτων της μονάδας ' \
-                      f'είναι τα παρακάτω :\n\n' + entries_table + f'\n\n\nΗ ειδοποίηση είναι μια αυτοματοποίηση ' \
-                                                                   'του τμήματος Δ\' της ΔΔΕ Ηρακλείου'
+                for recipient in recipient_list:
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        fail_silently=True,
+                        recipient_list=(recipient, )
+                    )
 
-            for recipient in recipient_list:
-                send_mail(
-                    subject=subject,
-                    message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    fail_silently=True,
-                    recipient_list=(recipient, )
-                )
-
-        except Exception as e:
-            logging.error("failed to notify users via email due to '%s'", str(e))
+            except Exception as e:
+                logging.error("failed to notify users via email due to '%s'", str(e))
+        else:
+            logging.info("SEND_FINALIZATION_EMAILS is false, not sending finalization update")
 
         logging.info("school '%s' successfully confirmed data on '%s'", school, utc_now)
 
