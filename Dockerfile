@@ -1,4 +1,4 @@
-FROM python:3.9-alpine AS compile-image
+FROM python:3.9-alpine3.19 AS compile-image
 ARG ENVIRONMENT=development
 
 ## update alpine and install build deps
@@ -12,7 +12,8 @@ RUN set -x \
         zlib-dev \
         libjpeg  \
         musl-dev \
-        mariadb-connector-c-dev
+        mariadb-connector-c-dev \
+        libffi-dev
         #mariadb-dev
         #mariadb-client
         #postgresql-dev
@@ -39,7 +40,7 @@ RUN set -x \
     && pip install -r ./requirements.txt
 
 
-FROM python:3.9-alpine AS runtime-image
+FROM python:3.9-alpine3.19 AS runtime-image
 ARG ENVIRONMENT=development
 
 # partially inspired from https://github.com/tiangolo/meinheld-gunicorn-docker
@@ -56,6 +57,7 @@ RUN set -x \
         mariadb-connector-c \
         mariadb-client \
         nginx \
+        libffi \
         vim
 
 ## copy Python dependencies from build image
