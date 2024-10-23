@@ -1102,7 +1102,6 @@ def excel_history(request):
 
 
 @login_required
-@user_passes_test(check_user_is_superuser)
 def excel_user_history(request):
     entries = HistoryEntry.objects.filter(owner=request.user)
 
