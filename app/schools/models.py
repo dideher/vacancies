@@ -30,13 +30,14 @@ class SchoolVariant(models.TextChoices):
 class School(models.Model):
     email = models.EmailField(unique=True, null=False, verbose_name='Email Σχολείου')
     name = models.CharField(max_length=100, unique=True, null=False, verbose_name='Όνομα Σχολείου')
-    myschool_name = models.CharField(max_length=100, null=True, verbose_name='Όνομα Σχολείου MySchool')
-    ministry_code = models.CharField(max_length=18, null=True, verbose_name='Κωδικός Υπουργείου')
-    principal = models.CharField(max_length=100, null=True, verbose_name='Διευθυντής Σχολείου')
-    phone = models.CharField(max_length=15, null=True, verbose_name='Τηλέφωνο Σχολείου')
-    address = models.CharField(max_length=100, null=True, verbose_name='Διεύθυνση Σχολείου')
+    myschool_name = models.CharField(max_length=100, null=True, verbose_name='Όνομα Σχολείου MySchool',
+                                     blank=True)
+    ministry_code = models.CharField(max_length=18, null=True, verbose_name='Κωδικός Υπουργείου', blank=True)
+    principal = models.CharField(max_length=100, null=True, verbose_name='Διευθυντής Σχολείου', blank=True)
+    phone = models.CharField(max_length=15, null=True, verbose_name='Τηλέφωνο Σχολείου', blank=True)
+    address = models.CharField(max_length=100, null=True, verbose_name='Διεύθυνση Σχολείου', blank=True)
     sibling_school = models.ForeignKey('self', null=True, on_delete=models.SET_NULL,
-                                       verbose_name='Συστεγαζόμενο Σχολείο')
+                                       verbose_name='Συστεγαζόμενο Σχολείο', blank=True)
     school_type = models.CharField(
         max_length=64,
         verbose_name=_('Έιδος Σχολείου'),
