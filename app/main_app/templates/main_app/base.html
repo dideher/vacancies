@@ -82,6 +82,9 @@
             {% if user.is_authenticated and not user.is_superuser and not user.profile.status %}
                 <div class="alert alert-danger">Δεν έχετε κάνει επικαιροποίηση.</div>
             {% endif %}
+            {% if school_requires_class_info and not school_has_class_info %}
+            <div class="alert alert-danger">Δεν έχουν δηλωθεί τμήματα στη μονάδα. <a href="{% url 'schools:manage_school_class_info' %}">Πατήστε εδώ για να δηλώσετε τμήματα</a></div>
+            {% endif %}
             {% block content %}{% endblock %}
         </div>
 
@@ -159,6 +162,15 @@
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'users:info' %}">Πληροφορίες για το Σχολείο</a>
                         </li>
+                        {% if school_requires_class_info %}
+                        <li class="list-group-item list-group-item-light sidebar">
+                            {% if school_has_class_info %}
+                                <a class="sidebar-item" href="{% url 'schools:manage_school_class_info' %}">Διαχείριση Τμημάτων Σχολείου</a>
+                            {% else %}
+                            <a class="sidebar-item" href="{% url 'schools:manage_school_class_info' %}"><strong>Διαχείριση Τμημάτων Σχολείου</strong></a>
+                            {% endif %}
+                        </li>
+                        {% endif %}
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'main_app:entry_create' %}">Προσθήκη καταχώρισης</a>
                         </li>

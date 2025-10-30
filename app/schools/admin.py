@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import School, SchoolGroup
+from .models import School, SchoolGroup, SchoolClassesInfo
 
 
 @admin.register(School)
@@ -13,3 +13,8 @@ class SchoolAdmin(admin.ModelAdmin):
 class SchoolGroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'neighboring_tag', 'ordering')
     ordering = ('ordering', )
+
+
+@admin.register(SchoolClassesInfo)
+class SchoolClassesInfoAdmin(admin.ModelAdmin):
+    pass

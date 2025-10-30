@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import SchoolsListView, SchoolDetailView
+from .views import SchoolsListView, SchoolDetailView, SchoolClassesInfoCreateOrUpdateView
 
 
 app_name = 'schools'
@@ -12,4 +12,5 @@ urlpatterns = [
     path('status_update/', views.status_update, name='status_update'),
     path('check_status/', views.check_status, name='check_status'),
     path('clear_status/', views.clear_status, name='clear_status'),
+    path('school_class_info/update/', SchoolClassesInfoCreateOrUpdateView.as_view(), name='manage_school_class_info'),
 ]

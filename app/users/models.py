@@ -16,7 +16,7 @@ class Profile(models.Model):
     )
     verified = models.BooleanField(default=False, verbose_name='Επαληθεύτηκε από τη ΔΔΕ')
     status = models.BooleanField(default=False, verbose_name='Έκανε επικαιροποίηση')
-    status_time = models.DateTimeField(default=None, null=True, verbose_name='Χρονική σήμανση επικαιροποίησης')
+    status_time = models.DateTimeField(default=None, null=True, verbose_name='Χρονική σήμανση επικαιροποίησης', blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'

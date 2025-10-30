@@ -1,9 +1,12 @@
 import datetime
 import logging
+from collections import OrderedDict
+
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.core.mail import BadHeaderError, send_mail, send_mass_mail
 from django.conf import settings
+from django.db import transaction
 from tabulate import tabulate
 from constance import config
 from django.utils import timezone
@@ -12,9 +15,18 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic import ListView, DetailView
-from .models import School
+from .models import School, SchoolType, SchoolClassesInfo
+
+from .forms import SchoolClassesInfoUpdateForm
 from users.models import Profile, User
-from main_app.models import Entry, EntryVariantType
+from main_app.models import Entry, EntryVariantType, Specialty
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView
+)
 
 from vacancies.utils.permissions import check_user_is_superuser
 
@@ -35,6 +47,7 @@ class SchoolDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
                 data['is_finalized'] = False
                 data['finalized_on'] = None
 
+            data['classes_info_allowed_school_types'] = [SchoolType.GYMNASIO.value, SchoolType.LYKEIO.value]
             data['school_entries'] = Entry.objects.filter(school=current_school).order_by('specialty')
         return data
 
@@ -154,3 +167,169 @@ def clear_status(request):
     else:
         return render(request, 'schools/clear_status.html')
 
+
+
+
+class SchoolClassesInfoCreateOrUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = SchoolClassesInfo
+    form_class = SchoolClassesInfoUpdateForm
+    template_name = 'schools/class_info_update.html'
+    context_object_name = 'entry'
+
+    success_url = '/info/'
+
+    def get_object(self, queryset=None):
+        user: User = self.request.user
+        user_profile: Profile = user.profile
+        school: School = user_profile.school
+        try:
+            school_classes_info = SchoolClassesInfo.objects.get(school=school)
+        except SchoolClassesInfo.DoesNotExist:
+            # school does not have class info, create one
+            return SchoolClassesInfo(school=school)
+        else:
+            return school_classes_info
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        # TODO: temp override fields based on the school ?
+
+        # form.fields.pop('a_grade_classes')
+        # form.fields.pop('a_grade_classes_over_21')
+
+        # ✅ self.object is available here
+        obj: SchoolClassesInfo = self.object
+        print(type(obj))
+        processed_fields = OrderedDict()
+        if obj.school.school_type == SchoolType.GYMNASIO.value:
+            for exclude_field in [
+                'b_grace_classes_prosanatolismou',
+                'b_grace_classes_anthropistikon',
+                'c_grade_classes_prosanatolismou',
+                'c_grade_classes_anthropistikon',
+                'c_grade_classes_thetikon',
+                'c_grade_classes_pliroforikis']:
+
+                form.fields.pop(exclude_field)
+        elif obj.school.school_type == SchoolType.LYKEIO.value:
+
+            for exclude_field in [
+                'c_grade_classes_german',
+                'c_grade_classes_french',]:
+
+                form.fields.pop(exclude_field)
+
+        # Example: hide a field if object is in a locked state
+        # if obj.is_locked:
+        #     form.fields.pop('status', None)
+
+        # Example: change label dynamically
+        # form.fields['b_grade_classes'].label = f"Editing {obj}"
+
+        return form
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            response = super().form_valid(form)
+            original_data: SchoolClassesInfo = self.get_object()
+
+            if original_data.school.school_type == SchoolType.GYMNASIO.value:
+
+                # LYKEIO DEN eXOUME TMHMATA PANW APO 21
+
+                # GYMNASIO
+                # GENIKIS PAIDIAS
+                school_total_classes = original_data.a_grade_classes + original_data.b_grade_classes + original_data.c_grade_classes
+
+                school_a_classes_less_than_21 = original_data.a_grade_classes - original_data.a_grade_classes_over_21
+                school_a_classes_more_than_21 = original_data.a_grade_classes_over_21
+
+                school_b_classes_less_than_21 = original_data.b_grade_classes - original_data.b_grade_classes_over_21
+                school_b_classes_more_than_21 = original_data.b_grade_classes_over_21
+
+                school_c_classes_less_than_21 = original_data.c_grade_classes - original_data.c_grade_classes_over_21
+                school_c_classes_more_than_21 = original_data.c_grade_classes_over_21
+
+                school_total_classes_less_than_21 = school_a_classes_less_than_21 + school_b_classes_less_than_21 + school_c_classes_less_than_21
+                school_total_classes_more_than_21 = school_a_classes_more_than_21 + school_b_classes_more_than_21 + school_c_classes_more_than_21
+
+                school_france_classes = original_data.a_grade_classes_french + original_data.b_grade_classes_french + original_data.c_grade_classes_french
+                school_german_classes = original_data.a_grade_classes_german + original_data.b_grade_classes_german + original_data.c_grade_classes_german
+
+                # PE01 - oti leei to FEK
+                pe01_hours = school_total_classes * 6
+                # PE02 - oti leei to FEK
+                pe02_hours = school_total_classes * 31
+                # PE03 - oti leei to FEK
+                pe03_hours = school_total_classes * 12
+                # PE04.01 - oti leei to FEK
+                pe04_01 = school_total_classes * 5
+                # PE04.02 - oti leei to FEK
+                pe04_02 = school_total_classes * 2
+                # PE04.04 - oti leei to FEK
+                # PE04.05 - oti leei to FEK
+
+                # PE06(AGGLIKA) - oti leei to FEK
+                pe06_hours = school_total_classes * 6
+
+                # PE08 - oti leei to FEK
+                pe08_hours = school_total_classes * 3
+                # PE11 - oti leei to FEK
+                pe11_hours = school_total_classes * 6
+                # PE79.01 - oti leei to FEK
+                pe79_01 = school_total_classes * 3
+                # PE78 - oti leei to FEK
+                pe78_hours = school_total_classes * 3
+
+                # KSENES GLWSSES
+                # PE05 (GALIKA) - OTI LEEI TO FEK
+                pe05_hours = school_france_classes * 6
+                # PE07 (GERMAMIKA) - OTI LEEI TO FEK
+                pe07_hours = school_german_classes
+
+                # Tmhmata me > 21 (pianei pe86, pe80, texnologia)
+                # OTI  TO LEEI TO FEK x2 GIA TA SYGKEKRIMENA TMIMATA
+
+
+                # PE80 - oti leei to FEK
+                pe80_hours = school_total_classes_less_than_21 * 2 + school_total_classes_more_than_21 * 4
+                # PE86 - oti leei to FEK
+                pe86_hours = school_total_classes_less_than_21 * 4 + school_total_classes_more_than_21 * 8
+                ### LYKEIO
+
+
+
+
+
+
+                Entry.objects.create(
+                    school=original_data.school,
+                    specialty=Specialty.objects.get(code='ΠΕ02'),
+                    owner=self.request.user,
+                    hours=10,
+                    type='Κενό',
+                    description="computed by me",
+                    variant=EntryVariantType.GENERAL_EDUCATION,
+                )
+
+            print("******* ", original_data)
+            # self.request.user.profile.status = False
+            # self.request.user.profile.status_time = None
+            # self.request.user.profile.save()
+            # HistoryEntry.objects.create(specialty=original_data.specialty, owner=original_data.owner,
+            #                             hours=original_data.hours, date_time=original_data.date_time,
+            #                             type=original_data.type,
+            #                             description=original_data.description, variant=original_data.variant)
+
+            return response
+
+    def test_func(self):
+        # TODO: we need to check here if the school is appropriate for the user
+        return True
+        # entry = self.get_object()
+        #
+        # if self.request.user == entry.owner:
+        #     return True
+        #
+        # return False

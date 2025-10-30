@@ -1,82 +1,119 @@
 {% extends "main_app/base.html" %}
 {% block content %}
-    <div class="content-section">
-        <h3>Πληροφορίες για το "{{ school.name }}"</h3>
-        <br />
-        {% if is_finalized %}
-            <div class="alert alert-success">Η σχολική μονάδα έχει επικαιροποιήσει επιτυχώς στις {{ finalized_on|date:'Y-m-d@H:i' }}</div>
-        {% else %}
-            <div class="alert alert-danger">H σχολική μονάδα ΔΕΝ έχει επικαιροποιήσει τα κενά/πλεονάσματα της</div>
-        {% endif %}
-        <table class="table table-sm">
-            <tbody>
-            <tr>
-                <td style="width: 40%">Κωδικός Υπουργείου</td>
-                <td>{{ school.ministry_code|default:'-' }}</td>
-            </tr>
-            <tr>
-                <td style="width: 40%">Ονομασία</td>
-                <td>{{ school.name }}</td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td><a href="mailto:{{ school.email }}"><code>{{ school.email }}</code></a></td>
-            </tr>
-            <tr>
-                <td>Διευθυντής</td>
-                <td>{{ school.principal }}</td>
-            </tr>
-            <tr>
-                <td>Τηλέφωνο</td>
-                <td>{{ school.phone }}</td>
-            </tr>
-            <tr>
-                <td>Διεύθυνση</td>
-                <td>{{ school.address }}</td>
-            </tr>
-            <tr>
-                <td>Έχει συνδεθεί με χρήστη</td>
-                <td>
-                    {% if school.managed_by %}
-                        Ναι
-                    {% else %}
-                        Όχι
-                    {% endif %}
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
-        <br />
-        <br />
-        <h5>Τρέχουσες Καταχωρίσεις</h5>
-        <br />
-        <table class="table table-hover table-sm">
-            <thead class="thead-light">
-                <tr>
-                    <th scope="col">Ειδικότητα</th>
-                    <th scope="col">Τύπος Κατ.</th>
-                    <th scope="col">Είδος</th>
-                    <th scope="col">Ώρες</th>
-                    <th scope="col">Παρατηρήσεις</th>
-                    <th scope="col">Ημ/νια Καταχ.</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for entry in school_entries %}
-                <tr>
-                    <td> {{ entry.specialty.code }} </td>
-                    <td>{{ entry.type }}</td>
-                    <td>{{ entry.get_variant_display }}</td>
-                    <td> {{ entry.hours }} </td>
-                    <td data-toggle="tooltip" data-placement="left" title="{{entry.description|default:''}}">
-                        {{ entry.description|default:'-'|truncatechars:10 }}
-                    </td>
-                    <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td>
-                </tr>
-            {% endfor %}
-            </tbody>
+<div class="content-section">
+    <h3>Πληροφορίες για το "{{ school.name }}"</h3>
+    <br/>
+    {% if is_finalized %}
+    <div class="alert alert-success">Η σχολική μονάδα έχει επικαιροποιήσει επιτυχώς στις {{
+        finalized_on|date:'Y-m-d@H:i' }}
+    </div>
+    {% else %}
+    <div class="alert alert-danger">H σχολική μονάδα ΔΕΝ έχει επικαιροποιήσει τα κενά/πλεονάσματα της</div>
+    {% endif %}
+    <table class="table table-sm">
+        <tbody>
+        <tr>
+            <td style="width: 40%">Κωδικός Υπουργείου</td>
+            <td>{{ school.ministry_code|default:'-' }}</td>
+        </tr>
+        <tr>
+            <td style="width: 40%">Ονομασία</td>
+            <td>{{ school.name }}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td><a href="mailto:{{ school.email }}"><code>{{ school.email }}</code></a></td>
+        </tr>
+        <tr>
+            <td>Διευθυντής</td>
+            <td>{{ school.principal }}</td>
+        </tr>
+        <tr>
+            <td>Τηλέφωνο</td>
+            <td>{{ school.phone }}</td>
+        </tr>
+        <tr>
+            <td>Διεύθυνση</td>
+            <td>{{ school.address }}</td>
+        </tr>
+        <tr>
+            <td>Έχει συνδεθεί με χρήστη</td>
+            <td>
+                {% if school.managed_by %}
+                Ναι
+                {% else %}
+                Όχι
+                {% endif %}
+            </td>
+        </tr>
+        </tbody>
     </table>
 
-    </div>
+    {% if school.school_type in classes_info_allowed_school_types %}
+    <br/>
+    <h5>Κατάσταση Τάξεων & Τμημάτων</h5>
+    <br/>
+
+    {% if school.classes_info %}
+    <table class="table table-sm">
+        <tbody>
+        <tr>
+            <td style="width: 40%">Συνολικά Τμήματα Α' Τάξης</td>
+            <td style="font-weight: bold">{{ school.classes_info.a_grade_classes|default:'0' }}</td>
+            <td style="width: 40%">Τμήματα Α' Τάξης με πάνω απο 21 μαθητές</td>
+            <td style="font-weight: bold">{{ school.classes_info.a_grade_classes_over_21|default:'0' }}</td>
+        </tr>
+        <tr>
+            <td style="width: 40%">Συνολικά Τμήματα B' Τάξης</td>
+            <td style="font-weight: bold">{{ school.classes_info.b_grade_classes|default:'0' }}</td>
+            <td style="width: 40%">Τμήματα Β' Τάξης με πάνω απο 21 μαθητές</td>
+            <td style="font-weight: bold">{{ school.classes_info.b_grade_classes_over_21|default:'0' }}</td>
+        </tr>
+        <tr>
+
+
+            <td style="width: 40%">Συνολικά Τμήματα Γ' Τάξης</td>
+            <td style="font-weight: bold">{{ school.classes_info.c_grade_classes|default:'0' }}</td>
+            <td style="width: 40%">Τμήματα Γ' Τάξης με πάνω απο 21 μαθητές</td>
+            <td style="font-weight: bold">{{ school.classes_info.c_grade_classes_over_21|default:'0' }}</td>
+        </tr>
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-danger">H σχολική μονάδα ΔΕΝ έχει ορίσει στοιχεία τμημάτων</div>
+    {% endif %}
+
+    <br/>
+    {% endif %}
+
+    <h5>Τρέχουσες Καταχωρίσεις</h5>
+    <br/>
+    <table class="table table-hover table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col">Ειδικότητα</th>
+            <th scope="col">Τύπος Κατ.</th>
+            <th scope="col">Είδος</th>
+            <th scope="col">Ώρες</th>
+            <th scope="col">Παρατηρήσεις</th>
+            <th scope="col">Ημ/νια Καταχ.</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in school_entries %}
+        <tr>
+            <td> {{ entry.specialty.code }}</td>
+            <td>{{ entry.type }}</td>
+            <td>{{ entry.get_variant_display }}</td>
+            <td> {{ entry.hours }}</td>
+            <td data-toggle="tooltip" data-placement="left" title="{{entry.description|default:''}}">
+                {{ entry.description|default:'-'|truncatechars:10 }}
+            </td>
+            <td> {{ entry.date_time|date:'Y-m-d@H:i' }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
 {% endblock content %}

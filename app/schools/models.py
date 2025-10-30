@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from django.core.exceptions import ValidationError
 
 class SchoolType(models.TextChoices):
     GYMNASIO = 'GYMNASIO', _('Γυμνάσια')
@@ -72,6 +72,14 @@ class School(models.Model):
         except Exception:
             return None
 
+
+    def requires_class_info(self):
+        """
+        Returns True if the school requires class info
+        :return:
+        """
+        return True if self.school_type in [SchoolType.LYKEIO, SchoolType.GYMNASIO] else False
+
     def __str__(self):
         return f'{self.name}'
 
@@ -88,3 +96,154 @@ class SchoolGroup(models.Model):
         return str(self.name)
 
 
+# GYMNASIO
+# A" GENIKIS -> ek twn opoion posa einai gallika, germanika, (to idio gia b kai g) (n+1)
+
+# LYKEIO :
+# A: posa ek twn genikis paidiais, posa einai galika kai posa germanika (n+1)
+# B: posa einai galika kai germanika kai prosanatolismou thetikwn kai an8rwpistikwn (auta ta dyo xwris elenxo sum)
+# G: posa apo auta einai prosnataolimso anr8rwpistiwn, thetikwn, ygeias & pliforikis ((auta ta 4 xwris elenxo sum))
+
+class SchoolClassesInfo(models.Model):
+
+    school = models.OneToOneField(School, null=False, on_delete=models.CASCADE, verbose_name='Σχολείο', blank=False, related_name='classes_info')
+
+    a_grade_classes = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γενικής Α' Τάξης",
+        help_text="Συνολικά Τμήματα Γενικής Α' Τάξης",
+        null=False,
+        default=0,
+
+    )
+    a_grade_classes_over_21 = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γενικής Α' Τάξης (πάνω από 21 μαθητές)",
+        null=False,
+        default=0,
+        help_text="Τμήματα Γενικής Α' Τάξης με πάνω απο 21 μαθητές",
+    )
+    a_grade_classes_french = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γαλλικών Α' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Γαλλικών Α' Τάξης",
+    )
+    a_grade_classes_german = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γερμανικών Α' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Γερμανικών Α' Τάξης",
+    )
+
+    b_grade_classes = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γενικής Β' Τάξης",
+        null=False,
+        default=0,
+        help_text="Συνολικά Τμήματα Γενικής Β' Τάξης",
+    )
+    b_grade_classes_over_21 = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γενικής Β' Τάξης (πάνω από 21 μαθητές)",
+        null=False,
+        default=0,
+        help_text="Τμήματα Γενικής Β' Τάξης με πάνω απο 21 μαθητές",
+    )
+    b_grade_classes_french = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γαλλικών Β' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Γαλλικών Β' Τάξης",
+    )
+    b_grade_classes_german = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γερμανικών Β' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Γερμανικών Β' Τάξης",
+    )
+    # only for LYKEIO
+    b_grace_classes_prosanatolismou = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Προσανατολισμού Β' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Προσανατολισμού Β' Τάξης",
+    )
+    b_grace_classes_anthropistikon = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Ανθρωπιστικών Β' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Ανθρωπιστικών Β' Τάξης",
+    )
+
+    c_grade_classes = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γενικής Γ' Τάξης",
+        null=False,
+        default=0,
+        help_text="Συνολικά Τμήματα Γενικής Γ' Τάξης",
+    )
+    c_grade_classes_over_21 = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γενικής Γ' Τάξης (πάνω από 21 μαθητές)",
+        null=False,
+        default=0,
+        help_text="Τμήματα Γενικής Γ' Τάξης με πάνω απο 21 μαθητές",
+    )
+    c_grade_classes_german = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γερμανικών Γ' Τάξης",
+        null=False,
+        default=0,
+        help_text="Συνολικά Τμήματα Γενικής Γ' Τάξης",
+    )
+    c_grade_classes_french = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Γαλλικών Γ' Τάξης",
+        null=False,
+        default=0,
+        help_text="Συνολικά Τμήματα Γενικής Γ' Τάξης",
+    )
+
+    # only for LYKEIO
+
+    c_grade_classes_prosanatolismou = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Προσανατολισμού Γ' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Προσανατολισμού Γ' Τάξης",
+    )
+
+    c_grade_classes_anthropistikon = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Ανθρωπιστικών Γ' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Ανθρωπιστικών Γ' Τάξης",
+    )
+
+    c_grade_classes_thetikon = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Θετικών Επιστημών Γ' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Θετικών Επιστημών Γ' Τάξης",
+    )
+
+    c_grade_classes_pliroforikis = models.PositiveSmallIntegerField(
+        verbose_name="Τμήματα Πληροφορικής & Υγείας Γ' Τάξης",
+        null=False,
+        default=0,
+        help_text="Τμήματα Πληροφορικής & Υγείας Γ' Τάξης",
+    )
+
+    # Automatically updated to the current timestamp whenever the object is saved
+    last_updated = models.DateTimeField(
+        verbose_name="Τελευταία ενημέρωση",
+        auto_now=True,
+    )
+
+
+    def clean(self):
+        if self.a_grade_classes_over_21 > self.a_grade_classes:
+            raise ValidationError({"a_grade_classes_over_21": "Ο αριθμός των τμημάτων Α' με πάνω απο 21 μαθητές δεν "
+                                                              "μπορεί να είναι μεγαλύτερος απο τον συνολικό αριθμό "
+                                                              "τμημάτων της Α'"})
+        if self.b_grade_classes_over_21 > self.b_grade_classes:
+            raise ValidationError({"b_grade_classes_over_21": "Ο αριθμός των τμημάτων Β' με πάνω απο 21 μαθητές δεν "
+                                                              "μπορεί να είναι μεγαλύτερος απο τον συνολικό αριθμό "
+                                                              "τμημάτων της Β'"})
+        if self.c_grade_classes_over_21 > self.c_grade_classes:
+            raise ValidationError({"c_grade_classes_over_21": "Ο αριθμός των τμημάτων Γ' με πάνω απο 21 μαθητές δεν "
+                                                              "μπορεί να είναι μεγαλύτερος απο τον συνολικό αριθμό "
+                                                              "τμημάτων της Γ'"})

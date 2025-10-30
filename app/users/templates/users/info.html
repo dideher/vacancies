@@ -14,7 +14,7 @@
             <tr>
                 <td style="width: 40%">Σχολείο</td>
                 {% if user.profile.verified %}
-                    <td>{{ user.last_name }}</td>
+                    <td>{{ school.name }}</td>
                 {% else %}
                     <td>Δεν έχει γίνει η επαλήθευση του χρήστη.</td>
                 {% endif %}
@@ -29,6 +29,19 @@
                     {% endif %}
                 </td>
             </tr>
+            {% if school_requires_class_info %}
+            <tr>
+                <td>Πληροφορίες Τμημάτων</td>
+                <td>
+                    {% if school_has_class_info %}
+                    Υπάρχουν πληροφορίες τμημάτων, τελευταία ενημέρωση στις {{ school_class_info.last_updated|date:"d/m/Y H:i" }}
+                    {% else %}
+                    <strong>Δεν έχουν καταχωρηθεί πληροφορίες τμημάτων</strong>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+
             <tr>
                 <td>Έγινε επικαιροποίηση</td>
                 <td>
