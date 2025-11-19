@@ -62,6 +62,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'vacancies.context_processors.global_context'
             ],
         },
     },
@@ -160,5 +161,6 @@ from collections import OrderedDict
 
 CONSTANCE_CONFIG = OrderedDict([
     ('SEND_FINALIZATION_EMAILS',  (True, 'If set to True finalization email notifications will be sent')),
+    ('DISABLE_SCHOOL_UPDATES', (False, 'If set to True schools will be unable to perform any changes')),
 ])
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'

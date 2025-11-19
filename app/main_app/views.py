@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.generic import (
@@ -14,7 +15,8 @@ from .models import Specialty, Entry
 from .forms import EntryCreateForm, EntryUpdateForm
 from history.models import HistoryEntry
 from vacancies.utils.permissions import check_user_is_superuser
-
+from vacancies.decorators import block_if_templated
+from vacancies.commons import school_updates_disallowed
 
 class SpecialtiesListView(LoginRequiredMixin, ListView):
     model = Specialty
@@ -26,6 +28,10 @@ class SpecialtiesListView(LoginRequiredMixin, ListView):
         return Specialty.objects.all().order_by('ordering')
 
 
+@method_decorator(
+    block_if_templated(condition_func=school_updates_disallowed, template_name='main_app/action_blocked.html'),
+    name='dispatch'
+)
 class EntryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Entry
 
@@ -103,6 +109,10 @@ class EntryDetailView(LoginRequiredMixin, DetailView):
     model = Entry
 
 
+@method_decorator(
+    block_if_templated(condition_func=school_updates_disallowed, template_name='main_app/action_blocked.html'),
+    name='dispatch'
+)
 class EntryCreateView(LoginRequiredMixin, CreateView):
     model = Entry
     form_class = EntryCreateForm
@@ -129,6 +139,10 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+@method_decorator(
+    block_if_templated(condition_func=school_updates_disallowed, template_name='main_app/action_blocked.html'),
+    name='dispatch'
+)
 class EntryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Entry
     form_class = EntryUpdateForm
