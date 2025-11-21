@@ -30,6 +30,7 @@
                         </td>
                         <!-- <td> {{ entry.date_time|date:'Y-m-d@H:i' }} </td> -->
                         <td>
+                            {% if not school_updates_disallowed %}
                             <a href="{% url 'main_app:entry_update' entry.id %}">
                                 <button type="button" class="btn btn-success btn-sm mt-1 mb-1" aria-label="Left Align" 
                                 data-toggle="tooltip" data-placement="top" title="Τροποίηση">
@@ -42,6 +43,7 @@
                                     <span class="bi-trash" aria-hidden="true"></span>
                                 </button>
                             </a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

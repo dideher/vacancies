@@ -15,7 +15,8 @@ from django.views.generic import ListView, DetailView
 from .models import School
 from users.models import Profile, User
 from main_app.models import Entry, EntryVariantType
-
+from vacancies.decorators import block_if_templated
+from vacancies.commons import school_updates_disallowed
 from vacancies.utils.permissions import check_user_is_superuser
 
 
@@ -68,7 +69,9 @@ def check_schools(request):
                                                           })
 
 
+
 @login_required
+@block_if_templated(condition_func=school_updates_disallowed, template_name='main_app/action_blocked.html')
 def status_update(request):
     if request.method == 'POST':
 
