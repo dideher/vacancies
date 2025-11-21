@@ -79,10 +79,16 @@
                     {% endif %}
                 {% endfor %}
             {% endif %}
-            {% if user.is_authenticated and not user.is_superuser and not user.profile.status %}
+            {% if is_school %}
+                {% if school_updates_disallowed %}
+                <div class="alert alert-danger">Προσωρινά έχει απενεργοποιηθεί η δυνατότητα καταχώρισης ή ενημέρωσης
+                    στοιχείων απο τις σχολικές μονάδες</div>
+                {% elif not user.profile.status %}
                 <div class="alert alert-danger">Δεν έχετε κάνει επικαιροποίηση.</div>
+                {% endif %}
             {% endif %}
             {% block content %}{% endblock %}
+
         </div>
 
         {% if user.is_authenticated %}
@@ -159,18 +165,23 @@
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'users:info' %}">Πληροφορίες για το Σχολείο</a>
                         </li>
+                        {% if not school_updates_disallowed %}
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'main_app:entry_create' %}">Προσθήκη καταχώρισης</a>
                         </li>
+                        {% endif %}
+
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'main_app:user_entries' %}">Προβολή καταχωρίσεων</a>
                         </li>
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'pdfs:pdf_user_entries' %}">Εκτύπωση καταχωρίσεων</a>
                         </li>
+                        {% if not school_updates_disallowed %}
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'schools:status_update' %}">Επικαιροποίηση</a>
                         </li>
+                        {% endif %}
                         <li class="list-group-item list-group-item-light sidebar">
                             <a class="sidebar-item" href="{% url 'history:user_history' %}">Ιστορικό Αλλαγών</a>
                         </li>
