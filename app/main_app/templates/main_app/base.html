@@ -86,6 +86,12 @@
                 {% elif not user.profile.status %}
                 <div class="alert alert-danger">Δεν έχετε κάνει επικαιροποίηση.</div>
                 {% endif %}
+            {% else %}
+            {% if school_updates_disallowed %}
+                <div class="alert alert-info">Οι σχολικές μονάδες δεν μπορούν να καταχωρήσουν ή να επεξεργαστούν
+                    κενά/πλεονάσματα !
+                </div>
+            {% endif %}
             {% endif %}
             {% block content %}{% endblock %}
 
